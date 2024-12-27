@@ -1,0 +1,69 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e5c184518262bf74a90ba213b455d86a, type: 3}
+  m_Name: shogisilver
+  m_EditorClassIdentifier: 
+  internalName: shogisilver
+  displayName: Silver General
+  description: 
+  effectDescription: 
+  startingHealth: 1
+  startingDamage: 2
+  energyCost: 2
+  hasEffect: 0
+  pieceType: 1
+  rarity: 1
+  pieceTags: []
+  movementSpots:
+  - location: {x: 1, y: -1}
+    type: 3
+  - location: {x: 1, y: 1}
+    type: 3
+  - location: {x: 0, y: 1}
+    type: 3
+  - location: {x: -1, y: 1}
+    type: 3
+  - location: {x: -1, y: -1}
+    type: 3
+  BeforeRoundStart:
+    m_PersistentCalls:
+      m_Calls: []
+  OnRoundStart:
+    m_PersistentCalls:
+      m_Calls: []
+  AfterRoundStart:
+    m_PersistentCalls:
+      m_Calls: []
+  BeforeMove:
+    m_PersistentCalls:
+      m_Calls: []
+  OnMove:
+    m_PersistentCalls:
+      m_Calls: []
+  AfterMove:
+    m_PersistentCalls:
+      m_Calls: []
+  BeforeRoundEnd:
+    m_PersistentCalls:
+      m_Calls: []
+  OnRoundEnd:
+    m_PersistentCalls:
+      m_Calls: []
+  AfterRoundEnd:
+    m_PersistentCalls:
+      m_Calls: []
+  OnAdd:
+    m_PersistentCalls:
+      m_Calls: []
+  OnRemove:
+    m_PersistentCalls:
+      m_Calls: []

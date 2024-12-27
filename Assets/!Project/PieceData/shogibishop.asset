@@ -1,0 +1,68 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e5c184518262bf74a90ba213b455d86a, type: 3}
+  m_Name: shogibishop
+  m_EditorClassIdentifier: 
+  internalName: shogibishop
+  displayName: Bishop
+  description: "\u9762\u767D\u3044\u3053\u3068\u306F\u4F55\u3082\u601D\u3044\u3064\u304B\u306A\u3044\u306E\u3067\u3001\u4EE3\u308F\u308A\u306B\u65E5\u672C\u8A9E\u306E\u30C6\u30AD\u30B9\u30C8\u3092\u3044\u304F\u3064\u304B\u8F09\u305B\u3066\u304A\u304D\u307E\u3059\u3002
+    \u7B11"
+  effectDescription: 
+  startingHealth: 1
+  startingDamage: 1
+  energyCost: 0
+  hasEffect: 0
+  pieceType: 1
+  rarity: 1
+  pieceTags: []
+  movementSpots:
+  - location: {x: 10, y: 10}
+    type: 6
+  - location: {x: 10, y: -10}
+    type: 6
+  - location: {x: -10, y: -10}
+    type: 6
+  - location: {x: -10, y: 10}
+    type: 6
+  BeforeRoundStart:
+    m_PersistentCalls:
+      m_Calls: []
+  OnRoundStart:
+    m_PersistentCalls:
+      m_Calls: []
+  AfterRoundStart:
+    m_PersistentCalls:
+      m_Calls: []
+  BeforeMove:
+    m_PersistentCalls:
+      m_Calls: []
+  OnMove:
+    m_PersistentCalls:
+      m_Calls: []
+  AfterMove:
+    m_PersistentCalls:
+      m_Calls: []
+  BeforeRoundEnd:
+    m_PersistentCalls:
+      m_Calls: []
+  OnRoundEnd:
+    m_PersistentCalls:
+      m_Calls: []
+  AfterRoundEnd:
+    m_PersistentCalls:
+      m_Calls: []
+  OnAdd:
+    m_PersistentCalls:
+      m_Calls: []
+  OnRemove:
+    m_PersistentCalls:
+      m_Calls: []
