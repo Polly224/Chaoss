@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   internalName: shogisilver
   displayName: Silver General
-  description: 
+  description: It's a <b>General</b>, not a Hedgehog.
   effectDescription: 
   startingHealth: 1
   startingDamage: 2
