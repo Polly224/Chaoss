@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   internalName: shogipawn
   displayName: Pawn
-  description: Well, Mario <i>is</i> Japanese, after all.
+  description: Well, Mario <b>is</b> from a Japanese company, after all.
   effectDescription: 
   startingHealth: 1
   startingDamage: 2
