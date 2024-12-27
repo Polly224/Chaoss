@@ -15,7 +15,7 @@ MonoBehaviour:
   internalName: pawn
   displayName: Pawn
   description: The Mario of chess.
-  effectDescription: This piece loses its upper <color="green">Movement Spot</color>
+  effectDescription: This piece loses its upper <color="green">Move Spot</color>
     after it's played
   startingHealth: 1
   startingDamage: 1

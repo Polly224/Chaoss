@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   internalName: queen
   displayName: Queen
-  description: Your lifeline's loving wife.
+  description: Your life support's loving wife.
   effectDescription: 
   startingHealth: 1
   startingDamage: 1
