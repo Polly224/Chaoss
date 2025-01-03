@@ -87,6 +87,7 @@ public class PieceManager : MonoBehaviour
             pickedPiece.GetComponent<PieceData>().UnpickPiece();
         }
         pickedPiece = null;
+        InfoHolder.instance.SetHover(false);
     }
 
     public void MovePiece(GameObject piece, Vector3 location)

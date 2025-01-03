@@ -348,11 +348,15 @@ public class PieceData : MonoBehaviour
 
     private void OnMouseEnter()
     {
-        transform.GetChild(2).gameObject.SetActive(true);
-        
+        if(PieceManager.pickedPiece == null)
+        {
+            if (!pieceData.hasEffect) InfoHolder.instance.SetInfo(pieceData.displayName, pieceData.description, pieceData.rarity);
+            else InfoHolder.instance.SetInfo(pieceData.displayName, pieceData.description, pieceData.rarity, pieceData.effectDescription);
+            InfoHolder.instance.SetHover(true);
+        }
     }
     private void OnMouseExit()
     {
-        transform.GetChild(2).gameObject.SetActive(false);
+        InfoHolder.instance.SetHover(false);
     }
 }

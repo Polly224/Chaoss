@@ -4,7 +4,7 @@ TrueTypeFontImporter:
   externalObjects: {}
   serializedVersion: 4
   fontSize: 16
-  forceTextureCase: -2
+  forceTextureCase: 0
   characterSpacing: 0
   characterPadding: 1
   includeFontData: 1
@@ -12,8 +12,8 @@ TrueTypeFontImporter:
   - Terminus (TTF)
   fallbackFontReferences: []
   customCharacters: 
-  fontRenderingMode: 0
-  ascentCalculationMode: 1
+  fontRenderingMode: 3
+  ascentCalculationMode: 2
   useLegacyBoundsCalculation: 0
   shouldRoundAdvanceValue: 1
   userData: 
