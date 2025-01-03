@@ -10,32 +10,37 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: e5c184518262bf74a90ba213b455d86a, type: 3}
-  m_Name: shogibishop
+  m_Name: antiqueen
   m_EditorClassIdentifier: 
-  internalName: shogibishop
-  displayName: Bishop
-  description: Didn't know Shogi had a shop just for Bi people.
+  internalName: antiqueen
+  displayName: Anti-Queen
+  description: Moves where the Queen can't, in a 2-square radius...?
   effectDescription: 
   startingHealth: 1
-  startingDamage: 1
-  energyCost: 0
+  startingDamage: 2
+  energyCost: 1
   hasEffect: 0
-  pieceType: 1
+  pieceType: 0
   rarity: 1
-  pieceTags: []
+  pieceTags:
+  - royal
   movementSpots:
-  - location: {x: 10, y: 10}
+  - location: {x: 1, y: 2}
     type: 3
-    isStrikeThrough: 1
-  - location: {x: 10, y: -10}
+  - location: {x: -1, y: 2}
     type: 3
-    isStrikeThrough: 1
-  - location: {x: -10, y: -10}
+  - location: {x: 1, y: -2}
     type: 3
-    isStrikeThrough: 1
-  - location: {x: -10, y: 10}
+  - location: {x: -1, y: -2}
     type: 3
-    isStrikeThrough: 1
+  - location: {x: 2, y: 1}
+    type: 3
+  - location: {x: 2, y: -1}
+    type: 3
+  - location: {x: -2, y: 1}
+    type: 3
+  - location: {x: -2, y: -1}
+    type: 3
   BeforeRoundStart:
     m_PersistentCalls:
       m_Calls: []

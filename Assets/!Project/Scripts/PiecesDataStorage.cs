@@ -12,11 +12,13 @@ public class PiecesDataStorage : ScriptableObject
     {
         public Vector2 location;
         public MovementSpotType type;
+        public bool isStrikeThrough;
 
-        public MovementSpot(Vector2 location, MovementSpotType type)
+        public MovementSpot(Vector2 location, MovementSpotType type, bool isStrikeThrough)
         {
             this.location = location;
             this.type = type;
+            this.isStrikeThrough = isStrikeThrough;
         }
     }
     [Serializable]
@@ -29,13 +31,7 @@ public class PiecesDataStorage : ScriptableObject
         // Can strike a piece on this spot
         S,
         // Can both move to this spot and strike a piece on it
-        MS,
-        // Can move to every spot inbetween this spot and the piece's location as long as there isn't a piece in the way
-        PierceToMove,
-        // Can strike every piece inbetween this spot and the piece's location as long as there isn't another piece in the way.
-        PierceToStrike,
-        // Can move to every spot or strike inbetween this spot and the piece's location as long as there isn't another piece in the way.
-        PierceToMoveStrike
+        MS
     }
 
     [Serializable]
@@ -77,15 +73,22 @@ public class PiecesDataStorage : ScriptableObject
     public List<string> pieceTags;
     public List<MovementSpot> movementSpots;
     [Header("Event-Based Code")]
+    // Called before a round starts, when a round starts, and after a round has started.
     public UnityEvent<GameObject> BeforeRoundStart;
     public UnityEvent<GameObject> OnRoundStart;
     public UnityEvent<GameObject> AfterRoundStart;
+    
+    // Called before the piece moves, once the piece moves, and after the piece has moved.
     public UnityEvent<GameObject> BeforeMove;
     public UnityEvent<GameObject> OnMove;
     public UnityEvent<GameObject> AfterMove;
+
+    // Called before a round ends, when a round ends, and after a round ends.
     public UnityEvent<GameObject> BeforeRoundEnd;
     public UnityEvent<GameObject> OnRoundEnd;
     public UnityEvent<GameObject> AfterRoundEnd;
+
+    // Respectively called when the piece is added to your set, and removed from your set.
     public UnityEvent<GameObject> OnAdd;
     public UnityEvent<GameObject> OnRemove;
 }

@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   internalName: shogilance
   displayName: Lance
-  description: Chess's favorite 1-dimensional being.
+  description: Shogi's favorite 1-dimensional being.
   effectDescription: 
   startingHealth: 1
   startingDamage: 2
@@ -25,7 +25,8 @@ MonoBehaviour:
   pieceTags: []
   movementSpots:
   - location: {x: 0, y: 10}
-    type: 6
+    type: 3
+    isStrikeThrough: 1
   BeforeRoundStart:
     m_PersistentCalls:
       m_Calls: []

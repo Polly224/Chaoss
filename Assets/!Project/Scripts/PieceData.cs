@@ -1,8 +1,10 @@
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
+using Unity.VisualScripting;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.Experimental.GlobalIllumination;
 
 public class PieceData : MonoBehaviour
 {
@@ -43,9 +45,13 @@ public class PieceData : MonoBehaviour
         Vector3 worldMousePos = Input.mousePosition;
         worldMousePos.z = 10.0f;
         worldMousePos = Camera.main.ScreenToWorldPoint(worldMousePos);
-        if (!isPicked)
-            transform.GetChild(0).position = new Vector3(transform.position.x, transform.position.y + 0.2f + 0.2f * -Mathf.Clamp(Vector3.Distance(transform.GetChild(0).position, worldMousePos), 0, 1), 0);
-        else transform.GetChild(0).position = new Vector3(transform.position.x, transform.position.y + 0.3f, 0);
+        if (isWhite)
+        {
+            if (!isPicked)
+                transform.GetChild(0).position = new Vector3(transform.position.x, transform.position.y + 0.1f + 0.1f * -Mathf.Clamp(Vector3.Distance(transform.GetChild(0).position, worldMousePos), 0, 1), 0);
+            else transform.GetChild(0).position = transform.position;
+        }
+        transform.GetChild(0).GetChild(0).gameObject.GetComponent<SpriteRenderer>().material.SetFloat("_OutlineSize", isPicked ? 1 : 0);
     }
 
     public void SetMovementSpots(List<PiecesDataStorage.MovementSpot> spotsToSet)
@@ -59,19 +65,16 @@ public class PieceData : MonoBehaviour
                 PiecesDataStorage.MovementSpotType.M => movementSpotPrefab,
                 PiecesDataStorage.MovementSpotType.S => strikeSpotPrefab,
                 PiecesDataStorage.MovementSpotType.MS => movementStrikeSpotPrefab,
-                PiecesDataStorage.MovementSpotType.PierceToMove => movementSpotPrefab,
-                PiecesDataStorage.MovementSpotType.PierceToStrike => strikeSpotPrefab,
-                PiecesDataStorage.MovementSpotType.PierceToMoveStrike => movementStrikeSpotPrefab,
                 _ => null
             };
-            if(mS.type != PiecesDataStorage.MovementSpotType.PierceToMove && mS.type != PiecesDataStorage.MovementSpotType.PierceToStrike && mS.type != PiecesDataStorage.MovementSpotType.PierceToMoveStrike)
+            if((bool)!mS.isStrikeThrough)
             {
                 if(spotToMake != null)
                 {
                     GameObject checkedPiece = PieceManager.GetPiece(transform.position + new Vector3(mS.location.x, mS.location.y, 0));
                     if (checkedPiece)
                     {
-                        if (!checkedPiece.GetComponent<PieceData>().isWhite)
+                        if (!checkedPiece.GetComponent<PieceData>().isWhite == isWhite)
                         {
                             if (mS.type == PiecesDataStorage.MovementSpotType.S || mS.type == PiecesDataStorage.MovementSpotType.MS)
                             {
@@ -106,7 +109,7 @@ public class PieceData : MonoBehaviour
                             bool stopAfter = false;
                             if(PieceManager.GetPiece(transform.position + new Vector3(i, 0, 0)))
                             {
-                                if(PieceManager.GetPiece(transform.position + new Vector3(i, 0, 0)).GetComponent<PieceData>().isWhite)
+                                if(PieceManager.GetPiece(transform.position + new Vector3(i, 0, 0)).GetComponent<PieceData>().isWhite == isWhite)
                                 {
                                     break;
                                 }
@@ -130,7 +133,7 @@ public class PieceData : MonoBehaviour
                             bool stopAfter = false;
                             if (PieceManager.GetPiece(transform.position + new Vector3(i, 0, 0)))
                             {
-                                if (PieceManager.GetPiece(transform.position + new Vector3(i, 0, 0)).GetComponent<PieceData>().isWhite)
+                                if (PieceManager.GetPiece(transform.position + new Vector3(i, 0, 0)).GetComponent<PieceData>().isWhite == isWhite)
                                 {
                                     break;
                                 }
@@ -154,7 +157,7 @@ public class PieceData : MonoBehaviour
                             bool stopAfter = false;
                             if (PieceManager.GetPiece(transform.position + new Vector3(0, i, 0)))
                             {
-                                if (PieceManager.GetPiece(transform.position + new Vector3(0, i, 0)).GetComponent<PieceData>().isWhite)
+                                if (PieceManager.GetPiece(transform.position + new Vector3(0, i, 0)).GetComponent<PieceData>().isWhite == isWhite)
                                 {
                                     break;
                                 }
@@ -178,7 +181,7 @@ public class PieceData : MonoBehaviour
                             bool stopAfter = false;
                             if (PieceManager.GetPiece(transform.position + new Vector3(0, i, 0)))
                             {
-                                if (PieceManager.GetPiece(transform.position + new Vector3(0, i, 0)).GetComponent<PieceData>().isWhite)
+                                if (PieceManager.GetPiece(transform.position + new Vector3(0, i, 0)).GetComponent<PieceData>().isWhite == isWhite)
                                 {
                                     break;
                                 }
@@ -207,7 +210,7 @@ public class PieceData : MonoBehaviour
                                 bool stopAfter = false;
                                 if (PieceManager.GetPiece(transform.position + new Vector3(i, i, 0)))
                                 {
-                                    if (PieceManager.GetPiece(transform.position + new Vector3(i, i, 0)).GetComponent<PieceData>().isWhite)
+                                    if (PieceManager.GetPiece(transform.position + new Vector3(i, i, 0)).GetComponent<PieceData>().isWhite == isWhite)
                                     {
                                         break;
                                     }
@@ -231,7 +234,7 @@ public class PieceData : MonoBehaviour
                                 bool stopAfter = false;
                                 if (PieceManager.GetPiece(transform.position + new Vector3(-i, i, 0)))
                                 {
-                                    if (PieceManager.GetPiece(transform.position + new Vector3(-i, i, 0)).GetComponent<PieceData>().isWhite)
+                                    if (PieceManager.GetPiece(transform.position + new Vector3(-i, i, 0)).GetComponent<PieceData>().isWhite == isWhite)
                                     {
                                         break;
                                     }
@@ -258,7 +261,7 @@ public class PieceData : MonoBehaviour
                                 bool stopAfter = false;
                                 if (PieceManager.GetPiece(transform.position + new Vector3(-i, i, 0)))
                                 {
-                                    if (PieceManager.GetPiece(transform.position + new Vector3(-i, i, 0)).GetComponent<PieceData>().isWhite)
+                                    if (PieceManager.GetPiece(transform.position + new Vector3(-i, i, 0)).GetComponent<PieceData>().isWhite == isWhite)
                                     {
                                         break;
                                     }
@@ -282,7 +285,7 @@ public class PieceData : MonoBehaviour
                                 bool stopAfter = false;
                                 if (PieceManager.GetPiece(transform.position + new Vector3(i, i, 0)))
                                 {
-                                    if (PieceManager.GetPiece(transform.position + new Vector3(i, i, 0)).GetComponent<PieceData>().isWhite)
+                                    if (PieceManager.GetPiece(transform.position + new Vector3(i, i, 0)).GetComponent<PieceData>().isWhite == isWhite)
                                     {
                                         break;
                                     }
@@ -315,12 +318,30 @@ public class PieceData : MonoBehaviour
     }
     private void OnMouseDown()
     {
+        if(isWhite)
         PickPiece();
     }
 
     private void PickPiece()
     {
         ReloadMovementSpots();
+        foreach (Transform spot in transform.GetChild(1))
+        {
+            if (spot.gameObject.GetComponent<MovementSpot>().spotType == PiecesDataStorage.MovementSpotType.S)
+            {
+                if (PieceManager.CheckForPiece(spot.position))
+                {
+                    if (!PieceManager.GetPiece(spot.position).GetComponent<PieceData>().isWhite == isWhite)
+                        spot.gameObject.SetActive(true);
+                    else
+                        spot.gameObject.SetActive(false);
+                }
+                else
+                {
+                    spot.gameObject.SetActive(false);
+                }
+            }
+        }
         transform.GetChild(1).gameObject.SetActive(true);
         PieceManager.instance.PiecePicked(gameObject);
     }
@@ -353,10 +374,50 @@ public class PieceData : MonoBehaviour
             if (!pieceData.hasEffect) InfoHolder.instance.SetInfo(pieceData.displayName, pieceData.description, pieceData.rarity);
             else InfoHolder.instance.SetInfo(pieceData.displayName, pieceData.description, pieceData.rarity, pieceData.effectDescription);
             InfoHolder.instance.SetHover(true);
+            GameObject moveSpotsHolder = GameObject.FindGameObjectWithTag("MoveSpotContainer");
+            if (moveSpotsHolder != null) 
+            {
+                for (int i = 0; i < movementSpots.Count; i++) 
+                {
+                    if (movementSpots[i].isStrikeThrough)
+                    {
+                        Vector2 loc = new(movementSpots[i].location.x == 0 ? 0 : Mathf.Sign(movementSpots[i].location.x), movementSpots[i].location.y == 0 ? 0 : Mathf.Sign(movementSpots[i].location.y));
+                        GameObject moveSquareDisplay = moveSpotsHolder.transform.GetChild((int)Mathf.Round(Mathf.Abs(loc.y - 2))).GetChild((int)Mathf.Round(loc.x + 2)).gameObject;
+                        moveSquareDisplay.GetComponent<SpriteRenderer>().color = new Color(91f / 255f, 1, 206f / 255f); 
+                        loc *= 2;
+                        moveSquareDisplay = moveSpotsHolder.transform.GetChild((int)Mathf.Round(Mathf.Abs(loc.y - 2))).GetChild((int)Mathf.Round(loc.x + 2)).gameObject;
+                        moveSquareDisplay.GetComponent<SpriteRenderer>().color = new Color(91f / 255f, 1, 206f / 255f);
+                    }
+                    else
+                    {
+                        Vector2 loc = movementSpots[i].location;
+                        GameObject moveSquareDisplay = moveSpotsHolder.transform.GetChild((int)Mathf.Round(Mathf.Abs(loc.y - 2))).GetChild((int)Mathf.Round(loc.x + 2)).gameObject;
+                        moveSquareDisplay.GetComponent<SpriteRenderer>().color = movementSpots[i].type switch
+                        {
+                            PiecesDataStorage.MovementSpotType.S => Color.red,
+                            PiecesDataStorage.MovementSpotType.M => Color.green,
+                            PiecesDataStorage.MovementSpotType.MS => Color.yellow,
+                            _ => new Color(130f / 255f, 130f / 255f, 130f / 255f)
+                        };
+                    }
+                }
+            }
         }
     }
     private void OnMouseExit()
     {
         InfoHolder.instance.SetHover(false);
+        GameObject moveSpotsHolder = GameObject.FindGameObjectWithTag("MoveSpotContainer");
+        if(PieceManager.pickedPiece == null)
+        {
+            if (moveSpotsHolder != null)
+            {
+                foreach(SpriteRenderer sR in moveSpotsHolder.transform.GetComponentsInChildren<SpriteRenderer>())
+                {
+                    if(sR.gameObject.name != "MoveSpotsHolder" && sR.gameObject.name != "PieceDot")
+                    sR.color = new Color(130f / 255f, 130f / 255f, 130f / 255f);
+                }
+            }
+        }
     }
 }

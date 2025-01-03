@@ -8,6 +8,7 @@ using UnityEngine;
 public class PieceDataDisplayTest : MonoBehaviour
 {
     [SerializeField] string[] pieceNames;
+    [SerializeField] string[] blackPieceNames;
     [SerializeField] GameObject piecePrefab;
     PiecesDataStorage pieceData;
     // Start is called before the first frame update
@@ -15,7 +16,11 @@ public class PieceDataDisplayTest : MonoBehaviour
     {
         for(int i = 0; i < pieceNames.Length; i++)
         {
-            SpawnPiece(pieceNames[i], new Vector3(i, 1, 0));
+            SpawnPiece(pieceNames[i], new Vector3(i, 1, 0), true);
+        }
+        for(int i = 0; i < blackPieceNames.Length; i++)
+        {
+            SpawnPiece(blackPieceNames[i], new Vector3(i, 6, 0), false);
         }
         foreach(GameObject g in GameObject.FindGameObjectsWithTag("Piece"))
         {
@@ -23,13 +28,13 @@ public class PieceDataDisplayTest : MonoBehaviour
         }
     }
 
-    public void SpawnPiece(string pieceName, Vector3 location)
+    public void SpawnPiece(string pieceName, Vector3 location, bool isWhite = true)
     {
         pieceData = AssetDatabase.LoadAssetAtPath<PiecesDataStorage>("Assets/!Project/PieceData/" + pieceName + ".asset");
         GameObject intPiece = Instantiate(piecePrefab, location, Quaternion.identity);
         intPiece.GetComponent<PieceData>().name = pieceData.name;
         intPiece.GetComponent<PieceData>().movementSpots = new List<PiecesDataStorage.MovementSpot>(pieceData.movementSpots);
-        intPiece.GetComponent<PieceData>().isWhite = true;
+        intPiece.GetComponent<PieceData>().isWhite = isWhite;
         intPiece.GetComponent<PieceData>().pieceData = pieceData;
         intPiece.GetComponent<PieceData>().pieceTags = pieceData.pieceTags;
         intPiece.transform.GetChild(0).GetChild(0).gameObject.GetComponent<SpriteRenderer>().sprite = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/!Project/Sprites/PieceSprites/" + pieceName + (intPiece.GetComponent<PieceData>().isWhite ? "W" : "B") + ".png");

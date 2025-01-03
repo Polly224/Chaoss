@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class MovementSpot : MonoBehaviour
 {
-    [SerializeField] PiecesDataStorage.MovementSpotType spotType;
+    public PiecesDataStorage.MovementSpotType spotType;
     private void OnMouseDown()
     {
         if(spotType == PiecesDataStorage.MovementSpotType.M)

@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using Unity.Burst.Intrinsics;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class PieceManager : MonoBehaviour
@@ -14,7 +15,6 @@ public class PieceManager : MonoBehaviour
         else Destroy(this);
     }
 
-    // Update is called once per frame
     void Update()
     {
         if (Input.GetMouseButtonDown(1))
