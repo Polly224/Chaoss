@@ -13,6 +13,7 @@ public class PieceData : MonoBehaviour
     public List<string> pieceTags;
     public bool isWhite;
     public bool isPicked = false;
+    public float maxHealth, baseDamage, actualHealth, actualDamage, baseEnergyCost, actualEnergyCost;
     [HideInInspector]
     public PiecesDataStorage pieceData;
     [SerializeField] GameObject movementSpotPrefab;
@@ -27,6 +28,12 @@ public class PieceData : MonoBehaviour
     public void StartFunc()
     {
         SetMovementSpots(pieceData.movementSpots);
+        maxHealth = pieceData.startingHealth;
+        baseDamage = pieceData.startingDamage;
+        baseEnergyCost = pieceData.energyCost;
+        actualHealth = maxHealth;
+        actualDamage = baseDamage;
+        actualEnergyCost = baseEnergyCost;
         nameText.text = pieceData.displayName;
         descriptionText.text = pieceData.description;
         effectText.text = pieceData.effectDescription;
@@ -67,7 +74,7 @@ public class PieceData : MonoBehaviour
                 PiecesDataStorage.MovementSpotType.MS => movementStrikeSpotPrefab,
                 _ => null
             };
-            if((bool)!mS.isStrikeThrough)
+            if(!mS.isStrikeThrough)
             {
                 if(spotToMake != null)
                 {

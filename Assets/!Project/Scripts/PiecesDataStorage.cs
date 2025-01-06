@@ -30,6 +30,10 @@ public class PiecesDataStorage : ScriptableObject
         M,
         // Can strike a piece on this spot
         S,
+        // Can do a ranged strike on this spot, not moving if it captures the piece it strikes
+        R,
+        // Can both move to this spot and do a ranged strike to a piece on it
+        MR,
         // Can both move to this spot and strike a piece on it
         MS
     }

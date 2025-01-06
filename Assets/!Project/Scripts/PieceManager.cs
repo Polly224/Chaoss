@@ -13,6 +13,7 @@ public class PieceManager : MonoBehaviour
     {
         if (instance == null) instance = this;
         else Destroy(this);
+        DontDestroyOnLoad(instance);
     }
 
     void Update()
@@ -26,13 +27,12 @@ public class PieceManager : MonoBehaviour
     public static bool CheckForPiece(Vector3 location)
     {
         bool pieceExists = false;
-        GameObject gA;
         foreach(GameObject g in GameObject.FindGameObjectsWithTag("Piece"))
         {
             if(g.transform.position == location)
             {
-                gA = g;
-                pieceExists = true; break;
+                pieceExists = true;
+                break;
             }
         }
         return pieceExists;
@@ -100,6 +100,10 @@ public class PieceManager : MonoBehaviour
         piece.GetComponent<PieceData>().AfterMove();
     }
     public void StrikePiece(GameObject piece, Vector3 location)
+    {
+        GameObject pieceToStrike = GetPiece(location);
+    }
+    public void RangedStrikePiece(GameObject piece, Vector3 location)
     {
         GameObject pieceToStrike = GetPiece(location);
     }

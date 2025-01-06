@@ -9,27 +9,45 @@ public class MovementSpot : MonoBehaviour
     {
         if(spotType == PiecesDataStorage.MovementSpotType.M)
         {
-            if (!PieceManager.GetPiece(transform.position))
+            if (!PieceManager.CheckForPiece(transform.position))
             {
                 PieceManager.instance.MovePiece(transform.root.gameObject, transform.position);
             }
         }
         if(spotType == PiecesDataStorage.MovementSpotType.S)
         {
-            if (PieceManager.GetPiece(transform.position))
+            if (PieceManager.CheckForPiece(transform.position))
             {
                 PieceManager.instance.StrikePiece(transform.root.gameObject, transform.position);
             }
         }
         if(spotType == PiecesDataStorage.MovementSpotType.MS)
         {
-            if (!PieceManager.GetPiece(transform.position))
+            if (!PieceManager.CheckForPiece(transform.position))
             {
                 PieceManager.instance.MovePiece(transform.root.gameObject, transform.position);
             }
-            if (PieceManager.GetPiece(transform.position))
+            else
             {
                 PieceManager.instance.StrikePiece(transform.root.gameObject, transform.position);
+            }
+        }
+        if(spotType == PiecesDataStorage.MovementSpotType.R)
+        {
+            if (PieceManager.CheckForPiece(transform.position))
+            {
+                PieceManager.instance.RangedStrikePiece(transform.root.gameObject, transform.position);
+            }
+        }
+        if(spotType == PiecesDataStorage.MovementSpotType.MR)
+        {
+            if (PieceManager.CheckForPiece(transform.position))
+            {
+                PieceManager.instance.RangedStrikePiece(transform.root.gameObject, transform.position);
+            }
+            else
+            {
+                PieceManager.instance.MovePiece(transform.root.gameObject, transform.position);
             }
         }
     }
