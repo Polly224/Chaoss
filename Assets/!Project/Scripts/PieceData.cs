@@ -5,6 +5,7 @@ using Unity.VisualScripting;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Experimental.GlobalIllumination;
+using UnityEngine.VFX;
 
 public class PieceData : MonoBehaviour
 {
@@ -13,12 +14,18 @@ public class PieceData : MonoBehaviour
     public List<string> pieceTags;
     public bool isWhite;
     public bool isPicked = false;
-    public float maxHealth, baseDamage, actualHealth, actualDamage, baseEnergyCost, actualEnergyCost;
+    public bool isHoveredOver = false;
+    public bool isHeld = false;
+    public int maxHealth, baseDamage, actualHealth, actualDamage, baseEnergyCost, actualEnergyCost;
+    public bool isDead = false;
     [HideInInspector]
     public PiecesDataStorage pieceData;
+    [SerializeField] VisualEffect hitEffect;
     [SerializeField] GameObject movementSpotPrefab;
     [SerializeField] GameObject strikeSpotPrefab;
     [SerializeField] GameObject movementStrikeSpotPrefab;
+    [SerializeField] GameObject rangedSpotPrefab;
+    [SerializeField] GameObject movementRangedSpotPrefab;
     [SerializeField] TMP_Text nameText;
     [SerializeField] TMP_Text descriptionText;
     [SerializeField] TMP_Text effectText;
@@ -54,11 +61,12 @@ public class PieceData : MonoBehaviour
         worldMousePos = Camera.main.ScreenToWorldPoint(worldMousePos);
         if (isWhite)
         {
-            if (!isPicked)
+            if (!isPicked && !isHeld)
                 transform.GetChild(0).position = new Vector3(transform.position.x, transform.position.y + 0.1f + 0.1f * -Mathf.Clamp(Vector3.Distance(transform.GetChild(0).position, worldMousePos), 0, 1), 0);
-            else transform.GetChild(0).position = transform.position;
+            else if (isPicked && !isHeld) transform.GetChild(0).position = transform.position;
+            else if (isHeld) transform.GetChild(0).position = worldMousePos;
         }
-        transform.GetChild(0).GetChild(0).gameObject.GetComponent<SpriteRenderer>().material.SetFloat("_OutlineSize", isPicked ? 1 : 0);
+        transform.GetChild(0).GetChild(0).gameObject.GetComponent<SpriteRenderer>().material.SetFloat("_OutlineSize", (isPicked || isHeld) ? 1 : 0);
     }
 
     public void SetMovementSpots(List<PiecesDataStorage.MovementSpot> spotsToSet)
@@ -72,6 +80,8 @@ public class PieceData : MonoBehaviour
                 PiecesDataStorage.MovementSpotType.M => movementSpotPrefab,
                 PiecesDataStorage.MovementSpotType.S => strikeSpotPrefab,
                 PiecesDataStorage.MovementSpotType.MS => movementStrikeSpotPrefab,
+                PiecesDataStorage.MovementSpotType.R => rangedSpotPrefab,
+                PiecesDataStorage.MovementSpotType.MR => movementRangedSpotPrefab,
                 _ => null
             };
             if(!mS.isStrikeThrough)
@@ -83,7 +93,7 @@ public class PieceData : MonoBehaviour
                     {
                         if (!checkedPiece.GetComponent<PieceData>().isWhite == isWhite)
                         {
-                            if (mS.type == PiecesDataStorage.MovementSpotType.S || mS.type == PiecesDataStorage.MovementSpotType.MS)
+                            if (mS.type == PiecesDataStorage.MovementSpotType.S || mS.type == PiecesDataStorage.MovementSpotType.MS || mS.type == PiecesDataStorage.MovementSpotType.R || mS.type == PiecesDataStorage.MovementSpotType.MR)
                             {
                                 GameObject intSpot = Instantiate(spotToMake, transform.GetChild(1));
                                 intSpot.transform.position = transform.position + new Vector3(mS.location.x, mS.location.y, 0);
@@ -102,7 +112,7 @@ public class PieceData : MonoBehaviour
                 int valCheck = (int)(Mathf.Abs(mS.location.x) + Mathf.Abs(mS.location.y));
                 if (valCheck == 0)
                 {
-                    Debug.Log("Strike Movement Spot is set to (0, 0). Fix that.");
+                    Debug.LogError("Strike Movement Spot is set to (0, 0). Fix that.");
                 }
 
                 // Orthogonal Code
@@ -325,8 +335,33 @@ public class PieceData : MonoBehaviour
     }
     private void OnMouseDown()
     {
-        if(isWhite)
-        PickPiece();
+        if (isWhite)
+        {
+            PickPiece();
+            isHeld = true;
+        }
+    }
+    private void OnMouseUp()
+    {
+        if (isWhite)
+        {
+            if (isHeld)
+            {
+                isHeld = false;
+                bool droppedOnMoveSpot = false;
+                foreach(Transform spot in transform.GetChild(1))
+                {
+                    if (spot.position == new Vector3(Mathf.Round(transform.GetChild(0).position.x), Mathf.Round(transform.GetChild(0).position.y), 0))
+                    {
+                        spot.gameObject.GetComponent<MovementSpot>().DoSpotAction(true);
+                        droppedOnMoveSpot = true;
+                        isHeld = false;
+                        break;
+                    }
+                }
+                if (!droppedOnMoveSpot) isHeld = false;
+            }
+        }
     }
 
     private void PickPiece()
@@ -334,7 +369,7 @@ public class PieceData : MonoBehaviour
         ReloadMovementSpots();
         foreach (Transform spot in transform.GetChild(1))
         {
-            if (spot.gameObject.GetComponent<MovementSpot>().spotType == PiecesDataStorage.MovementSpotType.S)
+            if (spot.gameObject.GetComponent<MovementSpot>().spotType == PiecesDataStorage.MovementSpotType.S || spot.gameObject.GetComponent<MovementSpot>().spotType == PiecesDataStorage.MovementSpotType.R)
             {
                 if (PieceManager.CheckForPiece(spot.position))
                 {
@@ -350,69 +385,78 @@ public class PieceData : MonoBehaviour
             }
         }
         transform.GetChild(1).gameObject.SetActive(true);
+        SetInfoDisplay();
+        SetMoveSpotDisplay();
+        transform.GetChild(0).GetChild(0).gameObject.GetComponent<SpriteRenderer>().sortingOrder = 15;
         PieceManager.instance.PiecePicked(gameObject);
     }
 
     public void UnpickPiece()
     {
+        isHeld = false;
         isPicked = false;
         transform.GetChild(1).gameObject.SetActive(false);
+        transform.GetChild(0).GetChild(0).gameObject.GetComponent<SpriteRenderer>().sortingOrder = 1;
     }
 
-    public void BeforeMove()
+
+    public void SetInfoDisplay()
     {
-        pieceData.BeforeMove.Invoke(gameObject);
+        if (!pieceData.hasEffect) InfoHolder.instance.SetInfo(pieceData.displayName, pieceData.description, actualHealth, actualDamage, actualEnergyCost, pieceData.rarity);
+        else InfoHolder.instance.SetInfo(pieceData.displayName, pieceData.description, actualHealth, actualDamage, actualEnergyCost, pieceData.rarity, pieceData.effectDescription);
+        InfoHolder.instance.SetHover(true);
     }
 
-    public void OnMove()
+    public void SetMoveSpotDisplay()
     {
-        pieceData.OnMove.Invoke(gameObject);
-    }
-
-    public void AfterMove() 
-    { 
-        pieceData.AfterMove.Invoke(gameObject);
-    }
-
-    private void OnMouseEnter()
-    {
-        if(PieceManager.pickedPiece == null)
+        GameObject moveSpotsHolder = GameObject.FindGameObjectWithTag("MoveSpotContainer");
+        if (moveSpotsHolder != null)
         {
-            if (!pieceData.hasEffect) InfoHolder.instance.SetInfo(pieceData.displayName, pieceData.description, pieceData.rarity);
-            else InfoHolder.instance.SetInfo(pieceData.displayName, pieceData.description, pieceData.rarity, pieceData.effectDescription);
-            InfoHolder.instance.SetHover(true);
-            GameObject moveSpotsHolder = GameObject.FindGameObjectWithTag("MoveSpotContainer");
-            if (moveSpotsHolder != null) 
+            for (int i = 0; i < movementSpots.Count; i++)
             {
-                for (int i = 0; i < movementSpots.Count; i++) 
+                if (movementSpots[i].isStrikeThrough)
                 {
-                    if (movementSpots[i].isStrikeThrough)
+                    Vector2 loc = new(movementSpots[i].location.x == 0 ? 0 : Mathf.Sign(movementSpots[i].location.x), movementSpots[i].location.y == 0 ? 0 : Mathf.Sign(movementSpots[i].location.y));
+                    GameObject moveSquareDisplay;
+                    for(int j = 0; j < 3; j++)
                     {
-                        Vector2 loc = new(movementSpots[i].location.x == 0 ? 0 : Mathf.Sign(movementSpots[i].location.x), movementSpots[i].location.y == 0 ? 0 : Mathf.Sign(movementSpots[i].location.y));
-                        GameObject moveSquareDisplay = moveSpotsHolder.transform.GetChild((int)Mathf.Round(Mathf.Abs(loc.y - 2))).GetChild((int)Mathf.Round(loc.x + 2)).gameObject;
-                        moveSquareDisplay.GetComponent<SpriteRenderer>().color = new Color(91f / 255f, 1, 206f / 255f); 
-                        loc *= 2;
-                        moveSquareDisplay = moveSpotsHolder.transform.GetChild((int)Mathf.Round(Mathf.Abs(loc.y - 2))).GetChild((int)Mathf.Round(loc.x + 2)).gameObject;
+                        loc *= (j + 1);
+                        moveSquareDisplay = moveSpotsHolder.transform.GetChild((int)Mathf.Round(Mathf.Abs(loc.y - 3))).GetChild((int)Mathf.Round(loc.x + 3)).gameObject;
                         moveSquareDisplay.GetComponent<SpriteRenderer>().color = new Color(91f / 255f, 1, 206f / 255f);
+                        loc /= (j + 1);
                     }
-                    else
+                }
+                else
+                {
+                    Vector2 loc = movementSpots[i].location;
+                    GameObject moveSquareDisplay = moveSpotsHolder.transform.GetChild((int)Mathf.Round(Mathf.Abs(loc.y - 3))).GetChild((int)Mathf.Round(loc.x + 3)).gameObject;
+                    moveSquareDisplay.GetComponent<SpriteRenderer>().color = movementSpots[i].type switch
                     {
-                        Vector2 loc = movementSpots[i].location;
-                        GameObject moveSquareDisplay = moveSpotsHolder.transform.GetChild((int)Mathf.Round(Mathf.Abs(loc.y - 2))).GetChild((int)Mathf.Round(loc.x + 2)).gameObject;
-                        moveSquareDisplay.GetComponent<SpriteRenderer>().color = movementSpots[i].type switch
-                        {
-                            PiecesDataStorage.MovementSpotType.S => Color.red,
-                            PiecesDataStorage.MovementSpotType.M => Color.green,
-                            PiecesDataStorage.MovementSpotType.MS => Color.yellow,
-                            _ => new Color(130f / 255f, 130f / 255f, 130f / 255f)
-                        };
-                    }
+                        PiecesDataStorage.MovementSpotType.S => Color.red,
+                        PiecesDataStorage.MovementSpotType.M => Color.green,
+                        PiecesDataStorage.MovementSpotType.MS => Color.yellow,
+                        PiecesDataStorage.MovementSpotType.R => new Color(195f / 255f, 84f / 255f, 1),
+                        PiecesDataStorage.MovementSpotType.MR => new Color(173f / 255f, 168f / 255f, 1),
+                        _ => new Color(130f / 255f, 130f / 255f, 130f / 255f)
+                    };
                 }
             }
         }
     }
+
+    private void OnMouseEnter()
+    {
+        isHoveredOver = true;
+        PieceManager.recentlyHoverPiece = gameObject;
+        if(PieceManager.pickedPiece == null)
+        {
+            SetInfoDisplay();
+            SetMoveSpotDisplay();
+        }
+    }
     private void OnMouseExit()
     {
+        isHoveredOver = false;
         InfoHolder.instance.SetHover(false);
         GameObject moveSpotsHolder = GameObject.FindGameObjectWithTag("MoveSpotContainer");
         if(PieceManager.pickedPiece == null)
@@ -426,5 +470,27 @@ public class PieceData : MonoBehaviour
                 }
             }
         }
+    }
+
+    public void Die()
+    {
+        // Placeholder.
+        gameObject.transform.position = new Vector3(10, transform.position.y, 0);
+        gameObject.transform.GetChild(3).localPosition = new Vector3(-10, 0, 0);
+        isDead = true;
+    }
+    public void BeforeMove()
+    {
+        pieceData.BeforeMove.Invoke(gameObject);
+    }
+
+    public void OnMove()
+    {
+        pieceData.OnMove.Invoke(gameObject);
+    }
+
+    public void AfterMove() 
+    { 
+        pieceData.AfterMove.Invoke(gameObject);
     }
 }

@@ -13,6 +13,9 @@ public class InfoHolder : MonoBehaviour
     [SerializeField] TMP_Text descriptionText;
     [SerializeField] TMP_Text effectText;
     [SerializeField] TMP_Text rarityText;
+    [SerializeField] TMP_Text healthText;
+    [SerializeField] TMP_Text attackText;
+    [SerializeField] TMP_Text energyText;
     public bool hoveredOver = false;
     [SerializeField] float alphaChangeSpeed;
 
@@ -38,10 +41,13 @@ public class InfoHolder : MonoBehaviour
         }
     }
 
-    public void SetInfo(string name, string description, PiecesDataStorage.Rarity rarity)
+    public void SetInfo(string name, string description, int health, int attack, int energy, PiecesDataStorage.Rarity rarity)
     {
         nameText.text = name;
         descriptionText.text = description;
+        healthText.text = health.ToString();
+        attackText.text = attack.ToString();
+        energyText.text = energy.ToString();
         rarityText.text = rarity.ToString();
         rarityText.transform.parent.gameObject.GetComponent<SpriteRenderer>().color = PieceManager.GetColorForRarity(rarity);
         effectText.transform.parent.gameObject.SetActive(false);
@@ -49,10 +55,13 @@ public class InfoHolder : MonoBehaviour
         descriptionText.rectTransform.sizeDelta = new Vector2(2.2f, 0.9f);
     }
 
-    public void SetInfo(string name, string description, PiecesDataStorage.Rarity rarity, string effect)
+    public void SetInfo(string name, string description, int health, int attack, int energy, PiecesDataStorage.Rarity rarity, string effect)
     {
         nameText.text = name;
         descriptionText.text = description;
+        healthText.text = health.ToString();
+        attackText.text = attack.ToString();
+        energyText.text = energy.ToString();
         rarityText.text = rarity.ToString();
         rarityText.transform.parent.gameObject.GetComponent<SpriteRenderer>().color = PieceManager.GetColorForRarity(rarity);
         effectText.transform.parent.gameObject.SetActive(true);

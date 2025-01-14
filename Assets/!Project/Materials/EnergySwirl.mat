@@ -7,7 +7,7 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: ShaderTest
+  m_Name: EnergySwirl
   m_Shader: {fileID: -6465566751694194690, guid: b6ce9fc8d3a20234b90455671e7be8be, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
@@ -59,13 +59,13 @@ Material:
     m_Floats:
     - _EnableExternalAlpha: 0
     - _HoleSize: 1
-    - _NoiseMovementSpeed: 0.5
+    - _NoiseMovementSpeed: 1
     - _NoiseScale: 1
     - _OutlineSize: 0.1
     m_Colors:
     - _Color: {r: 1, g: 1, b: 1, a: 1}
-    - _Color1: {r: 0, g: 0.25889835, b: 0.7058824, a: 0}
-    - _Color2: {r: 0, g: 1, b: 0.42463398, a: 0}
+    - _Color1: {r: 0.7661604, g: 0.035848916, b: 1, a: 0}
+    - _Color2: {r: 1, g: 0.5943396, b: 0.99078053, a: 0}
     - _Flip: {r: 1, g: 1, b: 1, a: 1}
     - _RendererColor: {r: 1, g: 1, b: 1, a: 1}
   m_BuildTextureStacks: []

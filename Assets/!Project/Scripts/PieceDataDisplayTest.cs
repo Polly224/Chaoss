@@ -30,14 +30,16 @@ public class PieceDataDisplayTest : MonoBehaviour
 
     public void SpawnPiece(string pieceName, Vector3 location, bool isWhite = true)
     {
+        // Spawns a given piece
         pieceData = AssetDatabase.LoadAssetAtPath<PiecesDataStorage>("Assets/!Project/PieceData/" + pieceName + ".asset");
         GameObject intPiece = Instantiate(piecePrefab, location, Quaternion.identity);
-        intPiece.GetComponent<PieceData>().name = pieceData.name;
-        intPiece.GetComponent<PieceData>().movementSpots = new List<PiecesDataStorage.MovementSpot>(pieceData.movementSpots);
-        intPiece.GetComponent<PieceData>().isWhite = isWhite;
-        intPiece.GetComponent<PieceData>().pieceData = pieceData;
-        intPiece.GetComponent<PieceData>().pieceTags = pieceData.pieceTags;
-        intPiece.transform.GetChild(0).GetChild(0).gameObject.GetComponent<SpriteRenderer>().sprite = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/!Project/Sprites/PieceSprites/" + pieceName + (intPiece.GetComponent<PieceData>().isWhite ? "W" : "B") + ".png");
-        intPiece.GetComponent<PieceData>().StartFunc();
+        PieceData pD = intPiece.GetComponent<PieceData>();
+        pD.name = pieceData.name;
+        pD.movementSpots = new List<PiecesDataStorage.MovementSpot>(pieceData.movementSpots);
+        pD.isWhite = isWhite;
+        pD.pieceData = pieceData;
+        pD.pieceTags = pieceData.pieceTags;
+        intPiece.transform.GetChild(0).GetChild(0).gameObject.GetComponent<SpriteRenderer>().sprite = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/!Project/Sprites/PieceSprites/" + pieceName + (pD.isWhite ? "W" : "B") + ".png");
+        pD.StartFunc();
     }
 }

@@ -7,47 +7,53 @@ public class MovementSpot : MonoBehaviour
     public PiecesDataStorage.MovementSpotType spotType;
     private void OnMouseDown()
     {
-        if(spotType == PiecesDataStorage.MovementSpotType.M)
+        DoSpotAction();
+    }
+
+    // Called when a piece is moved to this movement spot, either by clicking on the spot or by being dragged onto it.
+    public void DoSpotAction(bool fromHeld = false)
+    {
+        if (spotType == PiecesDataStorage.MovementSpotType.M)
         {
             if (!PieceManager.CheckForPiece(transform.position))
             {
-                PieceManager.instance.MovePiece(transform.root.gameObject, transform.position);
+                PieceManager.instance.MovePiece(transform.root.gameObject, transform.position, fromHeld);
             }
         }
-        if(spotType == PiecesDataStorage.MovementSpotType.S)
+        if (spotType == PiecesDataStorage.MovementSpotType.S)
         {
             if (PieceManager.CheckForPiece(transform.position))
             {
-                PieceManager.instance.StrikePiece(transform.root.gameObject, transform.position);
+                PieceManager.instance.StrikePiece(transform.root.gameObject, transform.position, fromHeld);
             }
         }
-        if(spotType == PiecesDataStorage.MovementSpotType.MS)
+        if (spotType == PiecesDataStorage.MovementSpotType.MS)
         {
             if (!PieceManager.CheckForPiece(transform.position))
             {
-                PieceManager.instance.MovePiece(transform.root.gameObject, transform.position);
+                PieceManager.instance.MovePiece(transform.root.gameObject, transform.position, fromHeld);
             }
             else
             {
-                PieceManager.instance.StrikePiece(transform.root.gameObject, transform.position);
+                PieceManager.instance.StrikePiece(transform.root.gameObject, transform.position, fromHeld);
             }
         }
-        if(spotType == PiecesDataStorage.MovementSpotType.R)
+        if (spotType == PiecesDataStorage.MovementSpotType.R)
         {
             if (PieceManager.CheckForPiece(transform.position))
             {
-                PieceManager.instance.RangedStrikePiece(transform.root.gameObject, transform.position);
+                PieceManager.instance.RangedStrikePiece(transform.root.gameObject, transform.position, fromHeld);
             }
         }
-        if(spotType == PiecesDataStorage.MovementSpotType.MR)
+        if (spotType == PiecesDataStorage.MovementSpotType.MR)
         {
             if (PieceManager.CheckForPiece(transform.position))
             {
-                PieceManager.instance.RangedStrikePiece(transform.root.gameObject, transform.position);
+                PieceManager.instance.RangedStrikePiece(transform.root.gameObject, transform.position, fromHeld);
             }
             else
             {
-                PieceManager.instance.MovePiece(transform.root.gameObject, transform.position);
+                PieceManager.instance.MovePiece(transform.root.gameObject, transform.position, fromHeld);
             }
         }
     }

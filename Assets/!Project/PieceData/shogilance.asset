@@ -25,7 +25,7 @@ MonoBehaviour:
   pieceTags: []
   movementSpots:
   - location: {x: 0, y: 10}
-    type: 3
+    type: 5
     isStrikeThrough: 1
   BeforeRoundStart:
     m_PersistentCalls:
