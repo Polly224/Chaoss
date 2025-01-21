@@ -32,6 +32,26 @@ public class EventPieceFunctions : MonoBehaviour
         g.GetComponent<PieceData>().movementSpots.Add(spot);
     }
 
+    public static void FirstMoveFree(GameObject g)
+    {
+        PieceData pD = g.GetComponent<PieceData>();
+
+        if(pD.pieceValues.Count == 0)
+        {
+            pD.pieceValues.Add(1);
+        }
+        if (pD.pieceValues[0] == 1)
+        {
+            pD.pieceValues[0] = 0;
+            RoundManager.instance.ChangeTurnMoveAmount(1);
+        }
+    }
+
+    public static void ResetPieceValues(GameObject g, int lmao)
+    {
+        g.GetComponent<PieceData>().pieceValues.Clear();
+    }
+
     // Function for the Random Piece (not implemented or tested yet).
     // Randomizes movement spots when called.
     public static void RandomizeMoveSpots(GameObject g)

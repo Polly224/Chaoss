@@ -13,6 +13,7 @@ public class PlayerSet : MonoBehaviour
     {
         if (instance == null) instance = this;
         else Destroy(this);
+        DontDestroyOnLoad(instance);
     }
 
     public void AddPiece(GameObject piece, bool addToCurrent = false)
@@ -20,6 +21,8 @@ public class PlayerSet : MonoBehaviour
         if(piece.GetComponent<PieceData>() != null)
         {
             currentSet.Add(piece);
+            PieceManager.whitePieces.Add(piece);
+            piece.GetComponent<PieceData>().pieceData.OnAdd.Invoke(piece);
             if(addToCurrent) roundSet.Add(piece);
         }
         else

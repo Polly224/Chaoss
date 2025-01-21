@@ -13,6 +13,7 @@ public class RoundManager : MonoBehaviour
     public static int playerEnergyPerTurn = 1;
     public static int playerEnergy;
     public static bool isPlayerTurn = true;
+    public static int turnCount;
     [SerializeField] float interval;
     [SerializeField] bool whitePlayedByCPU = false;
     [SerializeField] TMP_Text movesLeftText;
@@ -20,6 +21,7 @@ public class RoundManager : MonoBehaviour
     {
         if (instance == null) instance = this;
         else Destroy(this); 
+        DontDestroyOnLoad(instance);
     }
     private void Start()
     {
@@ -33,9 +35,11 @@ public class RoundManager : MonoBehaviour
 
     public void StartRound()
     {
+        turnCount = 1;
         PlayerSet.instance.SetPiles();
         SetTurnMoveAmount(maxMovesPerRound);
         blackMovesLeftThisRound = maxBlackMovesThisRound;
+        playerEnergy = playerEnergyPerTurn;
     }
 
     public bool ChangeTurnMoveAmount(int turnAmount)
@@ -59,6 +63,8 @@ public class RoundManager : MonoBehaviour
     {
         if (!isPlayerTurn)
         {
+            turnCount++;
+            foreach (GameObject g in PieceManager.whitePieces) g.GetComponent<PieceData>().pieceData.OnTurnStart?.Invoke(g, turnCount);
             SetTurnMoveAmount(maxMovesPerRound);
             isPlayerTurn = true;
             playerEnergy += playerEnergyPerTurn;
@@ -71,6 +77,14 @@ public class RoundManager : MonoBehaviour
             isPlayerTurn = false;
             StartCoroutine(TurnCalc());
             // Code for black's turn
+        }
+    }
+
+    public void EndRound()
+    {
+        foreach(GameObject g in PieceManager.whitePieces)
+        {
+            g.GetComponent<PieceData>().pieceValues.Clear();
         }
     }
 
@@ -87,7 +101,6 @@ public class RoundManager : MonoBehaviour
         {
             GameObject g = piecesToPickFrom[Random.Range(0, piecesToPickFrom.Count)];
             if(g.transform.GetChild(1).childCount > 0 && !g.GetComponent<PieceData>().isDead) {
-                Debug.Log(g.transform.GetChild(1).childCount);
                 pieceToMove = g;
                 break;
             }

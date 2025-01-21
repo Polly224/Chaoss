@@ -132,11 +132,13 @@ public class PieceManager : MonoBehaviour
         piece.GetComponent<PieceData>().isHeld = false;
         if(RoundManager.movesLeftThisRound > 0 && RoundManager.isPlayerTurn)
         {
+            piece.GetComponent<PieceData>().BeforeMove();
             StartCoroutine(PieceStrikeSequence(piece, location, wasHeld, false));
             RoundManager.instance.ChangeTurnMoveAmount(-1);
         }
         if (!RoundManager.isPlayerTurn)
         {
+            piece.GetComponent<PieceData>().BeforeMove();
             StartCoroutine(PieceStrikeSequence(piece, location, wasHeld, false));
             RoundManager.blackMovesLeftThisRound--;
         }
@@ -167,8 +169,9 @@ public class PieceManager : MonoBehaviour
         // Simply sets the piece's position to the new location if the piece was dragged onto a move spot.
         if (wasHeld)
         {
-            piece.transform.position = location;
             piece.transform.GetChild(0).localPosition = Vector3.zero;
+            piece.transform.position = location;
+            yield return null;
         }
         // If the piece was instead picked, and the move spot clicked, it lerps the piece's position to its new spot.
         if (!wasHeld)
@@ -178,7 +181,7 @@ public class PieceManager : MonoBehaviour
                 piece.transform.position = Vector3.Lerp(startPos, location, val);
                 val += Time.deltaTime * 15;
                 if(val > 1)
-                {
+                { 
                     piece.transform.position = location;
                     break;
                 }
@@ -199,6 +202,7 @@ public class PieceManager : MonoBehaviour
         // c) Which particles to spawn in the first place, based on whether the struck piece got captured
         float val = 0;
         Vector3 startPos = piece.transform.position;
+        piece.GetComponent<PieceData>().OnMove();
         GameObject pieceToStrike = GetPiece(location);
         VisualEffect strikeEffect;
         bool strikeKilled = false;
@@ -277,6 +281,7 @@ public class PieceManager : MonoBehaviour
             {
                 if(!attackRanged)
                 piece.transform.position = location;
+                piece.transform.GetChild(0).localPosition = Vector3.zero;
                 strikeEffect = Instantiate(deathEffect, location, Quaternion.identity).GetComponent<VisualEffect>();
                 strikeEffect.SendEvent("PlayRandDir");
                 Destroy(strikeEffect.gameObject, 5);

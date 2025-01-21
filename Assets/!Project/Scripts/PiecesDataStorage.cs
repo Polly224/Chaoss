@@ -92,6 +92,9 @@ public class PiecesDataStorage : ScriptableObject
     public UnityEvent<GameObject> BeforeRoundStart;
     public UnityEvent<GameObject> OnRoundStart;
     public UnityEvent<GameObject> AfterRoundStart;
+
+    // Called when a turn starts, and after a turn has started. The int is the turn number.
+    public UnityEvent<GameObject, int> OnTurnStart;
     
     // Called before the piece moves, once the piece moves, and after the piece has moved.
     public UnityEvent<GameObject> BeforeMove;

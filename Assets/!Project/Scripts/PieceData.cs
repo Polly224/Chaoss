@@ -20,6 +20,7 @@ public class PieceData : MonoBehaviour
     public bool isHeld = false;
     public int maxHealth, baseDamage, actualHealth, actualDamage, baseEnergyCost, actualEnergyCost;
     public bool isDead = false;
+    public List<int> pieceValues = new();
     [HideInInspector]
     public PiecesDataStorage pieceData;
     [SerializeField] VisualEffect hitEffect;
@@ -518,6 +519,7 @@ public class PieceData : MonoBehaviour
         // Placeholder. Once actually added, a dead piece should either be destroyed, or returned to the player's deck.
         gameObject.transform.position = new Vector3(10, transform.position.y, 0);
         gameObject.transform.GetChild(3).localPosition = new Vector3(-10, 0, 0);
+        gameObject.transform.GetChild(0).GetChild(0).localScale = Vector3.zero;
         isDead = true;
     }
 

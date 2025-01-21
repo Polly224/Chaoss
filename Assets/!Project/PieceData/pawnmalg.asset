@@ -10,33 +10,21 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: e5c184518262bf74a90ba213b455d86a, type: 3}
-  m_Name: shogirook
+  m_Name: pawnmalg
   m_EditorClassIdentifier: 
-  internalName: shogirook
-  displayName: Rook
-  description: Well hello to you, too.
+  internalName: 
+  displayName: 
+  description: 
   effectDescription: 
-  startingHealth: 2
-  startingDamage: 2
-  energyCost: 3
-  startingRows: 01000000
+  startingHealth: 0
+  startingDamage: 0
+  energyCost: 0
+  startingRows: 
   hasEffect: 0
-  pieceType: 1
-  rarity: 1
+  pieceType: 0
+  rarity: 0
   pieceTags: []
-  movementSpots:
-  - location: {x: 0, y: 10}
-    type: 5
-    isStrikeThrough: 1
-  - location: {x: 0, y: -10}
-    type: 5
-    isStrikeThrough: 1
-  - location: {x: 10, y: 0}
-    type: 5
-    isStrikeThrough: 1
-  - location: {x: -10, y: 0}
-    type: 5
-    isStrikeThrough: 1
+  movementSpots: []
   BeforeRoundStart:
     m_PersistentCalls:
       m_Calls: []
@@ -44,6 +32,9 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   AfterRoundStart:
+    m_PersistentCalls:
+      m_Calls: []
+  OnTurnStart:
     m_PersistentCalls:
       m_Calls: []
   BeforeMove:
