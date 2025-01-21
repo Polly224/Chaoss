@@ -16,7 +16,7 @@ MonoBehaviour:
   displayName: King
   description: Protect this one.
   effectDescription: 
-  startingHealth: 1
+  startingHealth: 5
   startingDamage: 1
   energyCost: 0
   startingRows: 00000000
@@ -59,6 +59,9 @@ MonoBehaviour:
   AfterRoundStart:
     m_PersistentCalls:
       m_Calls: []
+  OnTurnStart:
+    m_PersistentCalls:
+      m_Calls: []
   BeforeMove:
     m_PersistentCalls:
       m_Calls: []
@@ -66,6 +69,9 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   AfterMove:
+    m_PersistentCalls:
+      m_Calls: []
+  OnHover:
     m_PersistentCalls:
       m_Calls: []
   BeforeRoundEnd:

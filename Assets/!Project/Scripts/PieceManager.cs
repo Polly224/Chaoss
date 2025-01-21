@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using Unity.Burst.Intrinsics;
 using Unity.VisualScripting;
+using UnityEditor;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 using UnityEngine.VFX;
@@ -12,6 +13,7 @@ public class PieceManager : MonoBehaviour
     public static PieceManager instance;
     public static GameObject recentlyHoverPiece;
     [SerializeField] GameObject deathEffect;
+    [SerializeField] GameObject piecePrefab;
     public static List<GameObject> whitePieces = new();
     public static List<GameObject> blackPieces = new();
 
@@ -30,6 +32,40 @@ public class PieceManager : MonoBehaviour
         {
             UnpickPiece();
         }
+    }
+
+    public void PlayPiece(GameObject piece, Vector3 location)
+    {
+        PieceData pD = piece.GetComponent<PieceData>();
+        piece.transform.position = location;
+        pD.isOnBoard = true;
+    }
+    public GameObject SpawnPiece(string pieceName, Vector3 location, bool isWhite = true, bool addToPile = true)
+    {
+        // Spawns a given piece at the given location.
+        PiecesDataStorage pieceData = AssetDatabase.LoadAssetAtPath<PiecesDataStorage>("Assets/!Project/PieceData/" + pieceName + ".asset");
+        GameObject intPiece = Instantiate(piecePrefab, location, Quaternion.identity);
+        if (addToPile)
+        {
+            if (isWhite)
+            {
+                whitePieces.Add(intPiece);
+                PlayerSet.instance.currentSet.Add(intPiece);
+            }
+            else
+            {
+                blackPieces.Add(intPiece);
+            }
+        }
+        PieceData pD = intPiece.GetComponent<PieceData>();
+        pD.name = pieceData.name;
+        pD.isWhite = isWhite;
+        pD.movementSpots = new List<PiecesDataStorage.MovementSpot>(pieceData.movementSpots);
+        pD.pieceData = pieceData;
+        pD.pieceTags = pieceData.pieceTags;
+        intPiece.transform.GetChild(0).GetChild(0).gameObject.GetComponent<SpriteRenderer>().sprite = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/!Project/Sprites/PieceSprites/" + pieceName + (pD.isWhite ? "W" : "B") + ".png");
+        pD.StartFunc();
+        return intPiece;
     }
 
     public static bool CheckForPiece(Vector3 location)

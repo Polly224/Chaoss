@@ -5,6 +5,7 @@ using Unity.VisualScripting;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Experimental.GlobalIllumination;
+using UnityEngine.Rendering;
 using UnityEngine.VFX;
 
 public class PieceData : MonoBehaviour
@@ -20,6 +21,7 @@ public class PieceData : MonoBehaviour
     public bool isHeld = false;
     public int maxHealth, baseDamage, actualHealth, actualDamage, baseEnergyCost, actualEnergyCost;
     public bool isDead = false;
+    public bool isOnBoard = false;
     public List<int> pieceValues = new();
     [HideInInspector]
     public PiecesDataStorage pieceData;
@@ -423,6 +425,7 @@ public class PieceData : MonoBehaviour
     {
         // Called whenever a piece is clicked on. Resets the movement spots and makes them display.
         ReloadMovementSpots();
+        if(isOnBoard)
         transform.GetChild(1).gameObject.SetActive(true);
         SetInfoDisplay();
         SetMoveSpotDisplay();
@@ -500,6 +503,7 @@ public class PieceData : MonoBehaviour
     private void OnMouseEnter()
     {
         // Show a piece's data when it's hovered over.
+        pieceData.OnHover.Invoke(gameObject);
         isHoveredOver = true;
         PieceManager.recentlyHoverPiece = gameObject;
         if(PieceManager.pickedPiece == null)
@@ -521,6 +525,7 @@ public class PieceData : MonoBehaviour
         gameObject.transform.GetChild(3).localPosition = new Vector3(-10, 0, 0);
         gameObject.transform.GetChild(0).GetChild(0).localScale = Vector3.zero;
         isDead = true;
+        isOnBoard = false;
     }
 
     // Functions to make it easier to call a piece's unityevents from other scripts.

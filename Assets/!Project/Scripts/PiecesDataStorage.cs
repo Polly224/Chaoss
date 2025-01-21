@@ -101,6 +101,8 @@ public class PiecesDataStorage : ScriptableObject
     public UnityEvent<GameObject> OnMove;
     public UnityEvent<GameObject> AfterMove;
 
+    // Called when the mouse hovers over this piece.
+    public UnityEvent<GameObject> OnHover;
     // Called before a round ends, when a round ends, and after a round ends.
     public UnityEvent<GameObject> BeforeRoundEnd;
     public UnityEvent<GameObject> OnRoundEnd;

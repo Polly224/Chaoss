@@ -23,7 +23,8 @@ MonoBehaviour:
   hasEffect: 0
   pieceType: 1
   rarity: 1
-  pieceTags: []
+  pieceTags:
+  - pawn
   movementSpots:
   - location: {x: 0, y: 1}
     type: 5
@@ -37,6 +38,9 @@ MonoBehaviour:
   AfterRoundStart:
     m_PersistentCalls:
       m_Calls: []
+  OnTurnStart:
+    m_PersistentCalls:
+      m_Calls: []
   BeforeMove:
     m_PersistentCalls:
       m_Calls: []
@@ -44,6 +48,9 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   AfterMove:
+    m_PersistentCalls:
+      m_Calls: []
+  OnHover:
     m_PersistentCalls:
       m_Calls: []
   BeforeRoundEnd:

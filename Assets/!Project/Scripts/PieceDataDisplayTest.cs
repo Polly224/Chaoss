@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -11,8 +12,20 @@ public class PieceDataDisplayTest : MonoBehaviour
     [SerializeField] string[] blackPieceNames;
     [SerializeField] GameObject piecePrefab;
     PiecesDataStorage pieceData;
+    [Serializable]
+    public struct PieceSpawn
+    {
+        public Vector3 spawnPosition;
+        public string pieceName;
+
+        public PieceSpawn(Vector3 spawnPosition, string pieceName)
+        {
+            this.spawnPosition = spawnPosition;
+            this.pieceName = pieceName;
+        }
+    }
     // Start is called before the first frame update
-    void Start()
+/*    void Start()
     {
         for(int i = 0; i < pieceNames.Length; i++)
         {
@@ -34,6 +47,7 @@ public class PieceDataDisplayTest : MonoBehaviour
         {
             g.GetComponent<PieceData>().ReloadMovementSpots();
         }
+        RoundManager.instance.StartRound();
     }
 
     public void SpawnPiece(string pieceName, Vector3 location, bool isWhite = true)
@@ -50,6 +64,7 @@ public class PieceDataDisplayTest : MonoBehaviour
             PieceManager.blackPieces.Add(intPiece);
         }
         PieceData pD = intPiece.GetComponent<PieceData>();
+        pD.isOnBoard = true;
         pD.name = pieceData.name;
         pD.isWhite = isWhite;
         pD.movementSpots = new List<PiecesDataStorage.MovementSpot>(pieceData.movementSpots);
@@ -57,5 +72,5 @@ public class PieceDataDisplayTest : MonoBehaviour
         pD.pieceTags = pieceData.pieceTags;
         intPiece.transform.GetChild(0).GetChild(0).gameObject.GetComponent<SpriteRenderer>().sprite = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/!Project/Sprites/PieceSprites/" + pieceName + (pD.isWhite ? "W" : "B") + ".png");
         pD.StartFunc();
-    }
+    }*/
 }

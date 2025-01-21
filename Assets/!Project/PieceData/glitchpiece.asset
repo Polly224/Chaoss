@@ -10,32 +10,23 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: e5c184518262bf74a90ba213b455d86a, type: 3}
-  m_Name: pawn
+  m_Name: glitchpiece
   m_EditorClassIdentifier: 
-  internalName: pawn
-  displayName: Pawn
-  description: The Mario of chess.
-  effectDescription: This piece loses its upper <color="green">Move Spot</color>
-    after it's played.
+  internalName: glitchpiece
+  displayName: 3A3363
+  description: 6F6D67206869692121
+  effectDescription: This piece randomizes its <color="green">Move Spots</color>
+    every turn
   startingHealth: 1
-  startingDamage: 1
-  energyCost: 0
-  startingRows: 01000000
+  startingDamage: 3
+  energyCost: 3
+  startingRows: 000000000100000002000000
   hasEffect: 1
   pieceType: 0
-  rarity: 0
+  rarity: 3
   pieceTags:
   - pawn
-  movementSpots:
-  - location: {x: 0, y: 2}
-    type: 1
-    isStrikeThrough: 1
-  - location: {x: 1, y: 1}
-    type: 2
-    isStrikeThrough: 0
-  - location: {x: -1, y: 1}
-    type: 2
-    isStrikeThrough: 0
+  movementSpots: []
   BeforeRoundStart:
     m_PersistentCalls:
       m_Calls: []
@@ -47,16 +38,10 @@ MonoBehaviour:
       m_Calls: []
   OnTurnStart:
     m_PersistentCalls:
-      m_Calls: []
-  BeforeMove:
-    m_PersistentCalls:
-      m_Calls: []
-  OnMove:
-    m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 5260695948869464747, guid: e7affc0f72c09c44fb6b25ac62a7a4fd, type: 3}
         m_TargetAssemblyTypeName: EventPieceFunctions, Assembly-CSharp
-        m_MethodName: PawnPlayed
+        m_MethodName: RandomizeMoveSpots
         m_Mode: 0
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -65,7 +50,13 @@ MonoBehaviour:
           m_FloatArgument: 0
           m_StringArgument: 
           m_BoolArgument: 0
-        m_CallState: 1
+        m_CallState: 2
+  BeforeMove:
+    m_PersistentCalls:
+      m_Calls: []
+  OnMove:
+    m_PersistentCalls:
+      m_Calls: []
   AfterMove:
     m_PersistentCalls:
       m_Calls: []
@@ -77,19 +68,7 @@ MonoBehaviour:
       m_Calls: []
   OnRoundEnd:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 5260695948869464747, guid: e7affc0f72c09c44fb6b25ac62a7a4fd, type: 3}
-        m_TargetAssemblyTypeName: EventPieceFunctions, Assembly-CSharp
-        m_MethodName: PawnEndRound
-        m_Mode: 0
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
   AfterRoundEnd:
     m_PersistentCalls:
       m_Calls: []

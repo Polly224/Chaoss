@@ -1,8 +1,11 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
+using Unity.VisualScripting;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.EventSystems;
 
 public class EventPieceFunctions : MonoBehaviour
 {
@@ -54,19 +57,48 @@ public class EventPieceFunctions : MonoBehaviour
 
     // Function for the Random Piece (not implemented or tested yet).
     // Randomizes movement spots when called.
-    public static void RandomizeMoveSpots(GameObject g)
+    public static void RandomizeMoveSpots(GameObject g, int inT)
     {
-        int spotAmount = Random.Range(3, 11);
+        int spotAmount = Random.Range(1, 25);
         List<Vector2> spots = new();
-        g.GetComponent<PieceData>().movementSpots.Clear();
+        PieceData pD = g.GetComponent<PieceData>();
+        pD.movementSpots.Clear();
         for (int i = 0; i < spotAmount; i++)
         {   
             Vector2 randomSpot = new Vector2(Random.Range(-3, 4), Random.Range(-3, 4));
-            while (spots.Contains(randomSpot))
+            while (spots.Contains(randomSpot) || randomSpot == Vector2.zero)
             {
                 randomSpot = new Vector2(Random.Range(-3, 4), Random.Range(-3, 4));
             }
             spots.Add(randomSpot);
         }
+        for(int i = 0; i < spots.Count; i++)
+        {
+            PiecesDataStorage.MovementSpotType mST = (PiecesDataStorage.MovementSpotType)Random.Range(1, 6);
+            pD.movementSpots.Add(new(spots[i], mST, false));
+        }
+    }
+
+    public static void PawnAttackBoost(GameObject g)
+    {
+        PieceData pD = g.GetComponent<PieceData>();
+        pD.actualDamage = pD.baseDamage;
+        foreach (GameObject gO in PieceManager.whitePieces)
+        {
+            PieceData pDgO = gO.GetComponent<PieceData>();
+            if (pDgO.pieceTags.Contains("pawn") && pDgO.isOnBoard && !pDgO.isDead)
+            {
+                pD.actualDamage++;
+            }
+        }
+        foreach (GameObject gO in PieceManager.blackPieces)
+        {
+            PieceData pDgO = gO.GetComponent<PieceData>();
+            if (pDgO.pieceTags.Contains("pawn") && pDgO.isOnBoard && !pDgO.isDead)
+            {
+                pD.actualDamage++;
+            }
+        }
+        pD.SetInfoDisplay();
     }
 }
