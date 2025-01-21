@@ -19,4 +19,10 @@ public class DisappearTest : MonoBehaviour
         GetComponent<SpriteRenderer>().material.SetFloat("_HoleSize", holeSize);
         holeSize = Mathf.Lerp(holeSize, -0.2f, disappearSpeed * Time.deltaTime);
     }
+
+
+    void Example()
+    {
+        int[] ints = { 1, 2, 3 };
+    }
 }

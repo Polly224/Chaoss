@@ -11,6 +11,8 @@ public class PieceData : MonoBehaviour
 {
     public string pieceName;
     public List<PiecesDataStorage.MovementSpot> movementSpots;
+    // The amount of SPAWNED movement spots, the amount of spots that are actually instantiated. NOT the same as movementSpots.Count.
+    public int moveSpotAmount;
     public List<string> pieceTags;
     public bool isWhite;
     public bool isPicked = false;
@@ -34,7 +36,15 @@ public class PieceData : MonoBehaviour
     // Call this once all values have been set for this piece. Effectively replaces Start().
     public void StartFunc()
     {
+        SetDataFromScrObj();
         SetMovementSpots(pieceData.movementSpots);
+    }
+
+    private void SetDataFromScrObj()
+    {
+        // Gets data from the piece's respective scriptable object and sets it to the instantiated piece.
+        // Should only be called when the piece is first instantiated, as it's the BASE VALUES of the piece that it starts off with.
+        // Calling this at any point after a piece has been instantiated turns it BACK TO DEFAULT VALUES and undoes ANY UPGRADES.
         maxHealth = pieceData.startingHealth;
         baseDamage = pieceData.startingDamage;
         baseEnergyCost = pieceData.energyCost;
@@ -52,10 +62,18 @@ public class PieceData : MonoBehaviour
             descriptionText.gameObject.transform.localPosition = Vector3.zero;
             descriptionText.rectTransform.sizeDelta = new Vector2(2.2f, 0.9f);
         }
+        if (!isWhite)
+        {
+            for (int i = 0; i < movementSpots.Count; i++)
+            {
+                movementSpots[i] = new(new Vector2(movementSpots[i].location.x, -movementSpots[i].location.y), movementSpots[i].type, movementSpots[i].isStrikeThrough); ;
+            }
+        }
     }
 
     private void FixedUpdate()
     {
+        // Reads the mouse's position to lift the pieces up the closer the mouse is to them.
         Vector3 worldMousePos = Input.mousePosition;
         worldMousePos.z = 10.0f;
         worldMousePos = Camera.main.ScreenToWorldPoint(worldMousePos);
@@ -66,14 +84,17 @@ public class PieceData : MonoBehaviour
             else if (isPicked && !isHeld) transform.GetChild(0).position = transform.position;
             else if (isHeld) transform.GetChild(0).position = worldMousePos;
         }
+        // If the piece is either held or picked, it should show its outline.x1
         transform.GetChild(0).GetChild(0).gameObject.GetComponent<SpriteRenderer>().material.SetFloat("_OutlineSize", (isPicked || isHeld) ? 1 : 0);
     }
 
     public void SetMovementSpots(List<PiecesDataStorage.MovementSpot> spotsToSet)
     {
+        // Destroys the piece's movement spots, then correctly assigns and instantiates new spots for every spot in movementSpots.
         foreach(Transform child in transform.GetChild(1)) Destroy(child.gameObject);
         foreach(PiecesDataStorage.MovementSpot mS in spotsToSet)
         {
+            // Gets the correct movement spot type to instantiate.
             GameObject spotToMake = mS.type switch
             {
                 PiecesDataStorage.MovementSpotType.N => null,
@@ -88,8 +109,9 @@ public class PieceData : MonoBehaviour
             {
                 if(spotToMake != null)
                 {
+                    // Instantiates the given spot type at the spot's indicated location.
                     GameObject checkedPiece = PieceManager.GetPiece(transform.position + new Vector3(mS.location.x, mS.location.y, 0));
-                    if (checkedPiece)
+                    if (checkedPiece != null)
                     {
                         if (!checkedPiece.GetComponent<PieceData>().isWhite == isWhite)
                         {
@@ -106,9 +128,16 @@ public class PieceData : MonoBehaviour
                         intSpot.transform.position = transform.position + new Vector3(mS.location.x, mS.location.y, 0);
                     }
                 }
+                else
+                {
+
+                }
             }
             else
             {
+                /* Strikethrough pieces work differently. They keep adding new movement spots in the direction of the given spot
+                until the spots either reach the edges of the board, or hit a piece. */
+
                 int valCheck = (int)(Mathf.Abs(mS.location.x) + Mathf.Abs(mS.location.y));
                 if (valCheck == 0)
                 {
@@ -119,7 +148,7 @@ public class PieceData : MonoBehaviour
 
                 if(mS.location.x < 0 && mS.location.y == 0)
                 {
-                    for(int i = -1; i > mS.location.x; i--)
+                    for(int i = -1; i > mS.location.x - 1; i--)
                     {
                         if(transform.position.x + i > -1)
                         {
@@ -143,7 +172,7 @@ public class PieceData : MonoBehaviour
                 }
                 if(mS.location.x > 0 && mS.location.y == 0)
                 {
-                    for (int i = 1; i < mS.location.x; i++)
+                    for (int i = 1; i < mS.location.x + 1; i++)
                     {
                         if (transform.position.x + i < 8)
                         {
@@ -167,7 +196,7 @@ public class PieceData : MonoBehaviour
                 }
                 if(mS.location.y < 0 && mS.location.x == 0)
                 {
-                    for (int i = -1; i > mS.location.y; i--)
+                    for (int i = -1; i > mS.location.y - 1; i--)
                     {
                         if (transform.position.y + i > -1)
                         {
@@ -191,7 +220,7 @@ public class PieceData : MonoBehaviour
                 }
                 if(mS.location.y > 0 && mS.location.x == 0)
                 {
-                    for (int i = 1; i < mS.location.y; i++)
+                    for (int i = 1; i < mS.location.y + 1; i++)
                     {
                         if (transform.position.y + i < 8)
                         {
@@ -214,7 +243,9 @@ public class PieceData : MonoBehaviour
                     }
                 }
                 
+
                 // Diagonal code
+
 
                 if(mS.location.y > 0)
                 {
@@ -324,18 +355,40 @@ public class PieceData : MonoBehaviour
         {
             if (spot.position.x < 0 || spot.position.x > 7 || spot.position.y < 0 || spot.position.y > 7)
             {
-                spot.gameObject.SetActive(false);
+                Destroy(spot.gameObject);
+            }
+            if(PieceManager.CheckForPiece(spot.position))
+            if(PieceManager.GetPiece(spot.position).GetComponent<PieceData>().isWhite == isWhite && spot.gameObject.GetComponent<MovementSpot>().spotType == PiecesDataStorage.MovementSpotType.M)
+            {
+                Destroy(spot.gameObject);
+            }
+            if (spot.gameObject.GetComponent<MovementSpot>().spotType == PiecesDataStorage.MovementSpotType.S || spot.gameObject.GetComponent<MovementSpot>().spotType == PiecesDataStorage.MovementSpotType.R)
+            {
+                if(spot.position != null)
+                {
+                    if (PieceManager.CheckForPiece(spot.position))
+                    {
+                        if (PieceManager.GetPiece(spot.position).GetComponent<PieceData>().isWhite == isWhite)
+                            Destroy(spot.gameObject);
+                    }
+                    else
+                    {
+                        Destroy(spot.gameObject);
+                    }
+                }
             }
         }
     }
 
     public void ReloadMovementSpots()
     {
+        // Reads the movementSpots variable and assigns the piece actual movement spot objects to make them functional.
         SetMovementSpots(movementSpots);
     }
     private void OnMouseDown()
     {
-        if (isWhite)
+        // Pieces get picked when clicked on.
+        if (isWhite && RoundManager.isPlayerTurn)
         {
             PickPiece();
             isHeld = true;
@@ -343,6 +396,7 @@ public class PieceData : MonoBehaviour
     }
     private void OnMouseUp()
     {
+        // If the piece was being dragged onto a spot, it gets dropped onto that spot. Otherwise return it to its starting position.
         if (isWhite)
         {
             if (isHeld)
@@ -364,26 +418,10 @@ public class PieceData : MonoBehaviour
         }
     }
 
-    private void PickPiece()
+    public void PickPiece()
     {
+        // Called whenever a piece is clicked on. Resets the movement spots and makes them display.
         ReloadMovementSpots();
-        foreach (Transform spot in transform.GetChild(1))
-        {
-            if (spot.gameObject.GetComponent<MovementSpot>().spotType == PiecesDataStorage.MovementSpotType.S || spot.gameObject.GetComponent<MovementSpot>().spotType == PiecesDataStorage.MovementSpotType.R)
-            {
-                if (PieceManager.CheckForPiece(spot.position))
-                {
-                    if (!PieceManager.GetPiece(spot.position).GetComponent<PieceData>().isWhite == isWhite)
-                        spot.gameObject.SetActive(true);
-                    else
-                        spot.gameObject.SetActive(false);
-                }
-                else
-                {
-                    spot.gameObject.SetActive(false);
-                }
-            }
-        }
         transform.GetChild(1).gameObject.SetActive(true);
         SetInfoDisplay();
         SetMoveSpotDisplay();
@@ -409,7 +447,16 @@ public class PieceData : MonoBehaviour
 
     public void SetMoveSpotDisplay()
     {
+        // Sets the move spot display to the left of the chessboard to show this piece's movement spots in its display.
         GameObject moveSpotsHolder = GameObject.FindGameObjectWithTag("MoveSpotContainer");
+        if (moveSpotsHolder != null)
+        {
+            foreach (SpriteRenderer sR in moveSpotsHolder.transform.GetComponentsInChildren<SpriteRenderer>())
+            {
+                if (sR.gameObject.name != "MoveSpotsHolder" && sR.gameObject.name != "PieceDot")
+                    sR.color = new Color(130f / 255f, 130f / 255f, 130f / 255f);
+            }
+        }
         if (moveSpotsHolder != null)
         {
             for (int i = 0; i < movementSpots.Count; i++)
@@ -421,8 +468,13 @@ public class PieceData : MonoBehaviour
                     for(int j = 0; j < 3; j++)
                     {
                         loc *= (j + 1);
+                        if(Mathf.Abs(Vector3.Distance(new Vector3(loc.x, loc.y, 0), Vector3.zero)) > Mathf.Abs(Vector3.Distance(new Vector3(movementSpots[i].location.x, movementSpots[i].location.y, 0), Vector3.zero)))
+                            break;
                         moveSquareDisplay = moveSpotsHolder.transform.GetChild((int)Mathf.Round(Mathf.Abs(loc.y - 3))).GetChild((int)Mathf.Round(loc.x + 3)).gameObject;
-                        moveSquareDisplay.GetComponent<SpriteRenderer>().color = new Color(91f / 255f, 1, 206f / 255f);
+                        if (movementSpots[i].type != PiecesDataStorage.MovementSpotType.M)
+                            moveSquareDisplay.GetComponent<SpriteRenderer>().color = new Color(91f / 255f, 1, 206f / 255f);
+                        else
+                            moveSquareDisplay.GetComponent<SpriteRenderer>().color = Color.green;
                         loc /= (j + 1);
                     }
                 }
@@ -446,6 +498,7 @@ public class PieceData : MonoBehaviour
 
     private void OnMouseEnter()
     {
+        // Show a piece's data when it's hovered over.
         isHoveredOver = true;
         PieceManager.recentlyHoverPiece = gameObject;
         if(PieceManager.pickedPiece == null)
@@ -458,39 +511,32 @@ public class PieceData : MonoBehaviour
     {
         isHoveredOver = false;
         InfoHolder.instance.SetHover(false);
-        GameObject moveSpotsHolder = GameObject.FindGameObjectWithTag("MoveSpotContainer");
-        if(PieceManager.pickedPiece == null)
-        {
-            if (moveSpotsHolder != null)
-            {
-                foreach(SpriteRenderer sR in moveSpotsHolder.transform.GetComponentsInChildren<SpriteRenderer>())
-                {
-                    if(sR.gameObject.name != "MoveSpotsHolder" && sR.gameObject.name != "PieceDot")
-                    sR.color = new Color(130f / 255f, 130f / 255f, 130f / 255f);
-                }
-            }
-        }
     }
 
     public void Die()
     {
-        // Placeholder.
+        // Placeholder. Once actually added, a dead piece should either be destroyed, or returned to the player's deck.
         gameObject.transform.position = new Vector3(10, transform.position.y, 0);
         gameObject.transform.GetChild(3).localPosition = new Vector3(-10, 0, 0);
         isDead = true;
     }
+
+    // Functions to make it easier to call a piece's unityevents from other scripts.
+    // Instead of GameObject.GetComponent<PieceData>().pieceData.BeforeMove?.Invoke(GameObject);
+    // It's GameObject.GetComponent<Piecedata>().BeforeMove();
+    // Just for convenience, honestly.
     public void BeforeMove()
     {
-        pieceData.BeforeMove.Invoke(gameObject);
+        pieceData.BeforeMove?.Invoke(gameObject);
     }
 
     public void OnMove()
     {
-        pieceData.OnMove.Invoke(gameObject);
+        pieceData.OnMove?.Invoke(gameObject);
     }
 
     public void AfterMove() 
     { 
-        pieceData.AfterMove.Invoke(gameObject);
+        pieceData.AfterMove?.Invoke(gameObject);
     }
 }

@@ -7,6 +7,7 @@ TagManager:
   - Piece
   - MovementSpot
   - MoveSpotContainer
+  - RoundManager
   layers:
   - Default
   - TransparentFX

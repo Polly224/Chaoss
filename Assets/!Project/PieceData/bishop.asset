@@ -19,6 +19,7 @@ MonoBehaviour:
   startingHealth: 1
   startingDamage: 1
   energyCost: 2
+  startingRows: 00000000
   hasEffect: 0
   pieceType: 0
   rarity: 0

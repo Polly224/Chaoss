@@ -8,10 +8,17 @@ using UnityEngine.Events;
 public class PiecesDataStorage : ScriptableObject
 {
     [Serializable]
+    // A movement spot is a single dot that shows up when a piece is selected, indicating the squares the piece can move to.
     public struct MovementSpot
     {
+        // The spot's position, relative to the piece it's a child of. For example, a movement spot with location (1, 1) would be
+        // one spot up and right from the piece's position. A pawn has Strike spots in spots (-1, 1) and (1, 1).
+        // NOTE: Never set a spot to (0, 0). Things get fucky. Not sure why you'd want to, anyway.
         public Vector2 location;
+        // The spot's type. Defines how it acts when clicked on/dragged onto.
         public MovementSpotType type;
+        // If a spot is strikethrough, like a rook or queen. If the range should be infinite, set the location to 10 in the respective direction.
+        // If the range is limited, set it to what you want the range to be.
         public bool isStrikeThrough;
 
         public MovementSpot(Vector2 location, MovementSpotType type, bool isStrikeThrough)
@@ -43,6 +50,7 @@ public class PiecesDataStorage : ScriptableObject
     {
         // Should only be given to the default Chess pieces (Pawn, Knight, Bishop, etc.)
         Starter,
+        // Standard rarities, defines a piece's price in the shop, as well as its chance of showing up.
         Common,
         Uncommon,
         Rare,
@@ -69,6 +77,8 @@ public class PiecesDataStorage : ScriptableObject
     public int startingHealth;
     public int startingDamage;
     public int energyCost;
+    [Tooltip("Defines the y value of the row a piece can be placed in to start. Pawn's row is just 1, for example.")]
+    public int[] startingRows;
     [Tooltip("True if it has an additional effect (like a Pawn losing its 2nd move square.)")]
     public bool hasEffect;
     public PieceType pieceType;
@@ -77,6 +87,7 @@ public class PiecesDataStorage : ScriptableObject
     public List<string> pieceTags;
     public List<MovementSpot> movementSpots;
     [Header("Event-Based Code")]
+
     // Called before a round starts, when a round starts, and after a round has started.
     public UnityEvent<GameObject> BeforeRoundStart;
     public UnityEvent<GameObject> OnRoundStart;

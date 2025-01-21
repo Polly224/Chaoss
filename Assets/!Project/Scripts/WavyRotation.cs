@@ -8,13 +8,7 @@ public class WavyRotation : MonoBehaviour
     [SerializeField] float rotationSpeed;
     [SerializeField] float rotationAmount;
     float val = 0;
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
-
-    // Update is called once per frame
+    // Rotates the piece's info window a bit. Looks cool. Looks awesome. I love sine waves.
     void Update()
     {
         val += Time.deltaTime * rotationSpeed;

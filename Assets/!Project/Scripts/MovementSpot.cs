@@ -7,6 +7,7 @@ public class MovementSpot : MonoBehaviour
     public PiecesDataStorage.MovementSpotType spotType;
     private void OnMouseDown()
     {
+        if (transform.root.gameObject.GetComponent<PieceData>().isWhite)
         DoSpotAction();
     }
 

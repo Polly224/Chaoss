@@ -12,6 +12,8 @@ public class PieceManager : MonoBehaviour
     public static PieceManager instance;
     public static GameObject recentlyHoverPiece;
     [SerializeField] GameObject deathEffect;
+    public static List<GameObject> whitePieces = new();
+    public static List<GameObject> blackPieces = new();
 
     private void Awake()
     {
@@ -24,7 +26,7 @@ public class PieceManager : MonoBehaviour
     void Update()
     {
         // Any picked piece gets unpicked when the player presses RMB.
-        if (Input.GetMouseButtonDown(1))
+        if (Input.GetMouseButtonDown(1) && RoundManager.isPlayerTurn)
         {
             UnpickPiece();
         }
@@ -36,6 +38,7 @@ public class PieceManager : MonoBehaviour
         bool pieceExists = false;
         foreach(GameObject g in GameObject.FindGameObjectsWithTag("Piece"))
         {
+            if(g.transform != null)
             if(g.transform.position == location)
             {
                 pieceExists = true;
@@ -51,6 +54,7 @@ public class PieceManager : MonoBehaviour
         GameObject gA = null;
         foreach(GameObject g in GameObject.FindGameObjectsWithTag("Piece"))
         {
+            if(g.transform != null)
             if (g.transform.position == location)
             {
                 gA = g;
@@ -77,6 +81,7 @@ public class PieceManager : MonoBehaviour
 
     public void PiecePicked(GameObject piece)
     {
+        // Called when a piece gets clicked on, and picks it.
         if(pickedPiece != piece && pickedPiece != null)
         {
             pickedPiece.GetComponent<PieceData>().UnpickPiece();
@@ -85,35 +90,70 @@ public class PieceManager : MonoBehaviour
         piece.GetComponent<PieceData>().isPicked = true;
     }
 
-    private void UnpickPiece()
+    public void UnpickPiece()
     {
+        // Called when the player presses rmb. Unselects the selected piece.
         if(pickedPiece != null)
         {
             pickedPiece.GetComponent<PieceData>().UnpickPiece();
         }
         pickedPiece = null;
+        if(recentlyHoverPiece != null)
+        {
         if (recentlyHoverPiece.GetComponent<PieceData>().isHoveredOver)
         {
             recentlyHoverPiece.GetComponent<PieceData>().SetInfoDisplay();
             recentlyHoverPiece.GetComponent<PieceData>().SetMoveSpotDisplay();
         }
         InfoHolder.instance.SetHover(recentlyHoverPiece.GetComponent<PieceData>().isHoveredOver);
+        }
     }
 
     public void MovePiece(GameObject piece, Vector3 location, bool wasHeld = false)
     {
+        // Called when a move spot of the "Move" type is clicked.
         piece.GetComponent<PieceData>().isHeld = false;
-        piece.GetComponent<PieceData>().BeforeMove();
-        StartCoroutine(PieceMoveSequence(piece, location, wasHeld));
+        if(RoundManager.movesLeftThisRound > 0 && RoundManager.isPlayerTurn)
+        {
+            piece.GetComponent<PieceData>().BeforeMove();
+            StartCoroutine(PieceMoveSequence(piece, location, wasHeld));
+            RoundManager.instance.ChangeTurnMoveAmount(-1);
+        }
+        if (!RoundManager.isPlayerTurn)
+        {
+            piece.GetComponent<PieceData>().BeforeMove();
+            StartCoroutine(PieceMoveSequence(piece, location, wasHeld));
+            RoundManager.blackMovesLeftThisRound--;
+        }
     }
     public void StrikePiece(GameObject piece, Vector3 location, bool wasHeld = false)
     {
+        // Called when a move spot of the "Strike" type is clicked.
         piece.GetComponent<PieceData>().isHeld = false;
-        StartCoroutine(PieceStrikeSequence(piece, location, wasHeld));
+        if(RoundManager.movesLeftThisRound > 0 && RoundManager.isPlayerTurn)
+        {
+            StartCoroutine(PieceStrikeSequence(piece, location, wasHeld, false));
+            RoundManager.instance.ChangeTurnMoveAmount(-1);
+        }
+        if (!RoundManager.isPlayerTurn)
+        {
+            StartCoroutine(PieceStrikeSequence(piece, location, wasHeld, false));
+            RoundManager.blackMovesLeftThisRound--;
+        }
     }
     public void RangedStrikePiece(GameObject piece, Vector3 location, bool wasHeld = false)
     {
-        GameObject pieceToStrike = GetPiece(location);
+        // Called when a move spot of the "Ranged" type is clicked.
+        if(RoundManager.movesLeftThisRound > 0 && RoundManager.isPlayerTurn)
+        {
+            StartCoroutine(PieceStrikeSequence(piece, location, wasHeld, true));
+            RoundManager.instance.ChangeTurnMoveAmount(-1);
+        }
+        if (!RoundManager.isPlayerTurn) 
+        {
+            StartCoroutine(PieceStrikeSequence(piece, location, wasHeld, true));
+            RoundManager.blackMovesLeftThisRound--;
+        }
     }
 
     public IEnumerator PieceMoveSequence(GameObject piece, Vector3 location, bool wasHeld = false)
@@ -124,11 +164,13 @@ public class PieceManager : MonoBehaviour
         pD.OnMove();
         UnpickPiece();
         yield return null;
+        // Simply sets the piece's position to the new location if the piece was dragged onto a move spot.
         if (wasHeld)
         {
             piece.transform.position = location;
             piece.transform.GetChild(0).localPosition = Vector3.zero;
         }
+        // If the piece was instead picked, and the move spot clicked, it lerps the piece's position to its new spot.
         if (!wasHeld)
         {
             while (piece.transform.position != location) 
@@ -138,7 +180,6 @@ public class PieceManager : MonoBehaviour
                 if(val > 1)
                 {
                     piece.transform.position = location;
-                    
                     break;
                 }
                 yield return null;
@@ -150,8 +191,12 @@ public class PieceManager : MonoBehaviour
         yield return null;
     }
 
-    public IEnumerator PieceStrikeSequence(GameObject piece, Vector3 location, bool wasHeld) 
+    public IEnumerator PieceStrikeSequence(GameObject piece, Vector3 location, bool wasHeld, bool attackRanged = false) 
     {
+        // Strike code is a lot more complicated, considering it has to check for:
+        // a) Whether the struck piece got captured from the attack
+        // b) Which direction to shoot the particles in after the attack
+        // c) Which particles to spawn in the first place, based on whether the struck piece got captured
         float val = 0;
         Vector3 startPos = piece.transform.position;
         GameObject pieceToStrike = GetPiece(location);
@@ -167,6 +212,7 @@ public class PieceManager : MonoBehaviour
                 val += Time.deltaTime * 25;
                 if (val > 1)
                 {
+                    // Deals damage to the struck piece, sets strikeKilled to whether the attack captured the piece or not.
                     piece.transform.position = location;
                     pieceToStrike.GetComponent<PieceData>().actualHealth -= piece.GetComponent<PieceData>().actualDamage;
                     if (pieceToStrike.GetComponent<PieceData>().actualHealth <= 0) strikeKilled = true;
@@ -177,6 +223,7 @@ public class PieceManager : MonoBehaviour
             yield return null;
             if (!strikeKilled)
             {
+                // If the strike didn't capture, piece moves back to its initial position and the "hit" effect plays.
                 strikeEffect = pieceToStrike.transform.GetChild(3).gameObject.GetComponent<VisualEffect>();
                 strikeEffect.SetVector3("LaunchDirection", (location - startPos).normalized);
                 strikeEffect.SendEvent("Play");
@@ -196,11 +243,29 @@ public class PieceManager : MonoBehaviour
             }
             else
             {
+                // If it DID capture, leave the piece on the struck spot, and spawn the capture vfx effect.
                 strikeEffect = Instantiate(deathEffect, location, Quaternion.identity).GetComponent<VisualEffect>();
                 strikeEffect.SetVector3("LaunchDirection", (location - startPos).normalized);
                 strikeEffect.SendEvent("Play");
                 Destroy(strikeEffect.gameObject, 5);
                 pieceToStrike.GetComponent<PieceData>().Die();
+                yield return null;
+                // Unless the attack's ranged, in which case the piece moves back.
+                if (attackRanged)
+                {
+                    val = 0;
+                    while (piece.transform.position != startPos)
+                    {
+                        piece.transform.position = Vector3.Lerp(location, startPos, val);
+                        val += Time.deltaTime * 25;
+                        if (val > 1)
+                        {
+                            piece.transform.position = location;
+                            break;
+                        }
+                        yield return null;
+                    }
+                }
             }
         }
         else
@@ -210,6 +275,7 @@ public class PieceManager : MonoBehaviour
             if (pieceToStrike.GetComponent<PieceData>().actualHealth <= 0) strikeKilled = true;
             if (strikeKilled)
             {
+                if(!attackRanged)
                 piece.transform.position = location;
                 strikeEffect = Instantiate(deathEffect, location, Quaternion.identity).GetComponent<VisualEffect>();
                 strikeEffect.SendEvent("PlayRandDir");
