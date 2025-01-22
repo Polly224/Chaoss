@@ -25,6 +25,7 @@ public class RoundManager : MonoBehaviour
     [SerializeField] float interval;
     [SerializeField] bool whitePlayedByCPU = false;
     [SerializeField] TMP_Text movesLeftText;
+    [SerializeField] TMP_Text energyText;
     private void Awake()
     {
         if (instance == null) instance = this;
@@ -56,18 +57,18 @@ public class RoundManager : MonoBehaviour
 
     public void StartRun()
     {
-        playerKing = PieceManager.instance.SpawnPiece("king", new(15, 0, 0));
+        playerKing = PieceManager.instance.SpawnPiece("king", new(8.6f, -1, 1));
         List<string> pieces = new()
         {
             "bishop", "bishop", "rook", "rook", "knight", "knight", "queen"
         };
         for(int i = 0; i < pieces.Count; i++)
         {
-            PieceManager.instance.SpawnPiece(pieces[i], new(15, 0, 0));
+            PieceManager.instance.SpawnPiece(pieces[i], new(8.6f, -1, 1));
         }
         for(int i = 0; i < 8; i++)
         {
-            PlayerSet.instance.basePawnPile.Add(PieceManager.instance.SpawnPiece("pawn", new(10, 0, 0), true, false));
+            PlayerSet.instance.basePawnPile.Add(PieceManager.instance.SpawnPiece("pawn", new(8.6f, -1, 1), true, false));
         }
     }
     public void StartRound()
@@ -77,19 +78,22 @@ public class RoundManager : MonoBehaviour
         turnCount = 1;
         SetTurnMoveAmount(maxMovesPerRound);
         blackMovesLeftThisRound = maxBlackMovesThisRound;
-        playerEnergy = playerEnergyPerTurn;
+        SetEnergyAmount(playerEnergyPerTurn);
         for(int i = 0; i < blackPiecesToSpawn.Count; i++)
         {
             GameObject intPiece = PieceManager.instance.SpawnPiece(blackPiecesToSpawn[i].pieceName, new(10, 0, 0), false);
             PieceManager.instance.PlayPiece(intPiece, blackPiecesToSpawn[i].spawnPosition);
         }
         blackKing = PieceManager.instance.SpawnPiece("king", new(4, 7, 0), false);
+        PieceManager.instance.PlayPiece(blackKing, new(4, 7, 0));
         PieceManager.instance.PlayPiece(playerKing, new(4, 0, 0));
         PlayerSet.instance.SetPiles();
         playerKingData = playerKing.GetComponent<PieceData>();
         blackKingData = blackKing.GetComponent<PieceData>();
         blackKingData.actualHealth = roundCount;
         kingsSpawned = true;
+        for (int i = 0; i < 3; i++) PlayerSet.instance.DrawPiece();
+        PlayerSet.instance.DrawPawn();
         foreach (GameObject g in PieceManager.whitePieces) g.GetComponent<PieceData>().pieceData.OnTurnStart?.Invoke(g, turnCount);
         foreach (GameObject g in PieceManager.blackPieces) g.GetComponent<PieceData>().pieceData.OnTurnStart?.Invoke(g, turnCount);
     }
@@ -103,6 +107,22 @@ public class RoundManager : MonoBehaviour
             return true;
         }
         return false;
+    }
+    public bool ChangeEnergyAmount(int energyAmount)
+    {
+        if(playerEnergy + energyAmount >= 0)
+        {
+            playerEnergy += energyAmount;
+            energyText.text = playerEnergy.ToString();
+            return true;
+        }
+        return false;
+    }
+
+    public void SetEnergyAmount(int energyAmount)
+    {
+        playerEnergy = energyAmount;
+        energyText.text = playerEnergy.ToString();
     }
 
     public void SetTurnMoveAmount(int turnAmount)
@@ -121,7 +141,7 @@ public class RoundManager : MonoBehaviour
             foreach (GameObject g in PieceManager.blackPieces) g.GetComponent<PieceData>().pieceData.OnTurnStart?.Invoke(g, turnCount);
             SetTurnMoveAmount(maxMovesPerRound);
             isPlayerTurn = true;
-            playerEnergy += playerEnergyPerTurn;
+            ChangeEnergyAmount(playerEnergyPerTurn);
             if(whitePlayedByCPU)
             StartCoroutine(TurnCalc(true));
         }

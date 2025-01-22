@@ -5,10 +5,20 @@ using UnityEngine;
 public class MovementSpot : MonoBehaviour
 {
     public PiecesDataStorage.MovementSpotType spotType;
+    public bool isPlaySpot;
+    public GameObject pickedPiece;
     private void OnMouseDown()
     {
-        if (transform.root.gameObject.GetComponent<PieceData>().isWhite)
-        DoSpotAction();
+        if (!isPlaySpot)
+        {
+            if (transform.root.gameObject.GetComponent<PieceData>().isWhite)
+            DoSpotAction();
+        }
+        else
+        { 
+            PieceManager.instance.PlayPiece(pickedPiece, new(transform.position.x, transform.position.y, 0));
+            RoundManager.instance.ChangeEnergyAmount(-pickedPiece.GetComponent<PieceData>().baseEnergyCost);
+        }
     }
 
     // Called when a piece is moved to this movement spot, either by clicking on the spot or by being dragged onto it.

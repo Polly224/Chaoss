@@ -14,6 +14,7 @@ public class PieceManager : MonoBehaviour
     public static GameObject recentlyHoverPiece;
     [SerializeField] GameObject deathEffect;
     [SerializeField] GameObject piecePrefab;
+    [SerializeField] GameObject playSpotPrefab;
     public static List<GameObject> whitePieces = new();
     public static List<GameObject> blackPieces = new();
 
@@ -34,22 +35,51 @@ public class PieceManager : MonoBehaviour
         }
     }
 
+    public void ShowPlaySpots(GameObject piece, bool hideSpots = false)
+    {
+        transform.GetChild(0).gameObject.SetActive(false);
+        if (!hideSpots)
+        {
+            foreach (Transform t in transform.GetChild(0)) Destroy(t.gameObject);
+            int[] rows = piece.GetComponent<PieceData>().pieceData.startingRows;
+            for(int i = 0; i < 8; i++)
+            {
+                for(int j = 0; j < rows.Length; j++)
+                {
+                    GameObject g;
+                    if (!CheckForPiece(new(i, rows[j], 0)))
+                    {
+                        g = Instantiate(playSpotPrefab, new(i, rows[j], 0), Quaternion.identity, transform.GetChild(0));
+                        g.GetComponent<MovementSpot>().pickedPiece = piece;
+                    }
+                }
+            }
+            transform.GetChild(0).gameObject.SetActive(true);
+        }
+    }
+
     public void PlayPiece(GameObject piece, Vector3 location)
     {
         PieceData pD = piece.GetComponent<PieceData>();
         piece.transform.position = location;
+        piece.transform.GetChild(0).GetChild(0).gameObject.GetComponent<SpriteRenderer>().sortingOrder = 1;
         pD.isOnBoard = true;
+        if(PlayerSet.instance.playerHand.Contains(piece)) PlayerSet.instance.playerHand.Remove(piece);
+        UnpickPiece();
+        piece.transform.parent = null;
     }
     public GameObject SpawnPiece(string pieceName, Vector3 location, bool isWhite = true, bool addToPile = true)
     {
         // Spawns a given piece at the given location.
         PiecesDataStorage pieceData = AssetDatabase.LoadAssetAtPath<PiecesDataStorage>("Assets/!Project/PieceData/" + pieceName + ".asset");
         GameObject intPiece = Instantiate(piecePrefab, location, Quaternion.identity);
+        intPiece.transform.GetChild(0).GetChild(0).gameObject.GetComponent<SpriteRenderer>().sortingOrder = -1;
         if (addToPile)
         {
             if (isWhite)
             {
                 whitePieces.Add(intPiece);
+                if(pieceData.internalName != "king")
                 PlayerSet.instance.currentSet.Add(intPiece);
             }
             else
@@ -148,7 +178,7 @@ public class PieceManager : MonoBehaviour
     public void MovePiece(GameObject piece, Vector3 location, bool wasHeld = false)
     {
         // Called when a move spot of the "Move" type is clicked.
-        piece.GetComponent<PieceData>().isHeld = false;
+        piece.GetComponent<PieceData>().isHeld = false; 
         if(RoundManager.movesLeftThisRound > 0 && RoundManager.isPlayerTurn)
         {
             piece.GetComponent<PieceData>().BeforeMove();

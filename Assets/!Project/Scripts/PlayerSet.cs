@@ -50,31 +50,60 @@ public class PlayerSet : MonoBehaviour
 
     public void SetPiles()
     {
-        Debug.Log(currentSet.Count);
         roundSet = new List<GameObject>(currentSet);
         roundPawnPile = new List<GameObject>(basePawnPile);
+        ShufflePiles();
     }
 
     public void DrawPiece()
     {
-        Debug.Log(roundSet.Count);
-        playerHand.Add(roundSet[^1]);
-        roundSet[^1].transform.SetParent(handHolder.transform, true);
-        roundSet.Remove(roundSet[^1]);
-        for(int i = 0; i < playerHand.Count; i++)
+        if (roundSet.Count > 0)
         {
-            playerHand[i].transform.localPosition = new Vector3(-1.7f, 0, 0) + Vector3.right * i;
+            playerHand.Add(roundSet[^1]);
+            roundSet[^1].transform.SetParent(handHolder.transform, true);
+            roundSet.Remove(roundSet[^1]);
+            for (int i = 0; i < playerHand.Count; i++)
+            {
+                playerHand[i].transform.localPosition = new Vector3(-1.7f, 0, 0) + ((4f / playerHand.Count) * i * Vector3.right) + Vector3.back * i;
+                playerHand[i].transform.GetChild(0).GetChild(0).gameObject.GetComponent<SpriteRenderer>().sortingOrder = i + 1;
+            }
         }
     }
 
     public void DrawPawn()
     {
-        playerHand.Add(roundPawnPile[^1]);
-        roundPawnPile[^1].transform.SetParent(handHolder.transform, true);
-        roundPawnPile.Remove(roundPawnPile[^1]);
+        if(roundPawnPile.Count > 0)
+        {
+            playerHand.Add(roundPawnPile[^1]);
+            roundPawnPile[^1].transform.SetParent(handHolder.transform, true);
+            roundPawnPile.Remove(roundPawnPile[^1]);
+            for (int i = 0; i < playerHand.Count; i++)
+            {
+                playerHand[i].transform.localPosition = new Vector3(-1.7f, 0, 0) + ((3.5f / playerHand.Count) * i * Vector3.right) + Vector3.back * i;
+                playerHand[i].transform.GetChild(0).GetChild(0).gameObject.GetComponent<SpriteRenderer>().sortingOrder = i + 1;
+            }
+        }
+    }
+
+    public void ResetLayering()
+    {
         for (int i = 0; i < playerHand.Count; i++)
         {
-            playerHand[i].transform.localPosition = new Vector3(-1.7f, 0, 0) + Vector3.right * i;
+            playerHand[i].transform.localPosition = new Vector3(-1.7f, 0, 0) + ((3.5f / playerHand.Count) * i * Vector3.right) + Vector3.back * i;
+            playerHand[i].transform.GetChild(0).GetChild(0).gameObject.GetComponent<SpriteRenderer>().sortingOrder = i + 1;
         }
+    }
+
+    public void ShufflePiles()
+    {
+        List<GameObject> tempPile = new();
+        int num = roundSet.Count;
+        for(int i = 0; i < num; i++)
+        {
+            GameObject gO = roundSet[Random.Range(0, roundSet.Count)];
+            roundSet.Remove(gO);
+            tempPile.Add(gO);
+        }
+        roundSet = new List<GameObject>(tempPile);
     }
 }

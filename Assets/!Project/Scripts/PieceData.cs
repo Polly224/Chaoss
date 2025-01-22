@@ -393,8 +393,16 @@ public class PieceData : MonoBehaviour
         // Pieces get picked when clicked on.
         if (isWhite && RoundManager.isPlayerTurn)
         {
-            PickPiece();
-            isHeld = true;
+            if (isOnBoard)
+            {
+                PickPiece();
+                isHeld = true;
+            }
+            if(!isOnBoard && RoundManager.playerEnergy >= actualEnergyCost)
+            {
+                PickPiece();
+                isHeld = true;
+            }
         }
     }
     private void OnMouseUp()
@@ -416,6 +424,21 @@ public class PieceData : MonoBehaviour
                         break;
                     }
                 }
+                if (!isOnBoard)
+                {
+                    foreach (Transform spot in PieceManager.instance.gameObject.transform.GetChild(0))
+                    {
+                        if (spot.position == new Vector3(Mathf.Round(transform.GetChild(0).position.x), Mathf.Round(transform.GetChild(0).position.y), 0))
+                        {
+                            gameObject.transform.GetChild(0).localPosition = Vector3.zero;
+                            PieceManager.instance.PlayPiece(gameObject, spot.position);
+                            droppedOnMoveSpot = true;
+                            isHeld = false;
+                            RoundManager.instance.ChangeEnergyAmount(-baseEnergyCost);
+                            break;
+                        }
+                    }
+                }
                 if (!droppedOnMoveSpot) isHeld = false;
             }
         }
@@ -425,12 +448,13 @@ public class PieceData : MonoBehaviour
     {
         // Called whenever a piece is clicked on. Resets the movement spots and makes them display.
         ReloadMovementSpots();
-        if(isOnBoard)
-        transform.GetChild(1).gameObject.SetActive(true);
         SetInfoDisplay();
         SetMoveSpotDisplay();
         transform.GetChild(0).GetChild(0).gameObject.GetComponent<SpriteRenderer>().sortingOrder = 15;
         PieceManager.instance.PiecePicked(gameObject);
+        if (isOnBoard)
+            transform.GetChild(1).gameObject.SetActive(true);
+        else PieceManager.instance.ShowPlaySpots(gameObject);
     }
 
     public void UnpickPiece()
@@ -438,7 +462,9 @@ public class PieceData : MonoBehaviour
         isHeld = false;
         isPicked = false;
         transform.GetChild(1).gameObject.SetActive(false);
+        PieceManager.instance.ShowPlaySpots(gameObject, true);
         transform.GetChild(0).GetChild(0).gameObject.GetComponent<SpriteRenderer>().sortingOrder = 1;
+        PlayerSet.instance.ResetLayering();
     }
 
 
@@ -511,11 +537,20 @@ public class PieceData : MonoBehaviour
             SetInfoDisplay();
             SetMoveSpotDisplay();
         }
+        if (!isWhite && PieceManager.pickedPiece == null)
+        {
+            ReloadMovementSpots();
+            transform.GetChild(1).gameObject.SetActive(true);
+        }
     }
     private void OnMouseExit()
     {
         isHoveredOver = false;
         InfoHolder.instance.SetHover(false);
+        if (!isWhite)
+        {
+            transform.GetChild(1).gameObject.SetActive(false);
+        }
     }
 
     public void Die()
