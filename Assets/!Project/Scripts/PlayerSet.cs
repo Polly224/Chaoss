@@ -19,6 +19,18 @@ public class PlayerSet : MonoBehaviour
         DontDestroyOnLoad(instance);
     }
 
+    private void Update()
+    {
+        if(!RoundManager.gameOver)
+        for(int i = 0; i < playerHand.Count; i++)
+        {
+            if (Input.GetKeyDown((i + 1).ToString()))
+            {
+                playerHand[i].GetComponent<PieceData>().MouseClickFunc();
+                playerHand[i].GetComponent<PieceData>().isHeld = false;
+            }
+        }
+    }
     public void AddPiece(GameObject piece, bool addToCurrent = false)
     {
         if(piece.GetComponent<PieceData>() != null)
@@ -57,11 +69,14 @@ public class PlayerSet : MonoBehaviour
 
     public void DrawPiece()
     {
+        ShufflePiles();
         if (roundSet.Count > 0)
         {
-            playerHand.Add(roundSet[^1]);
-            roundSet[^1].transform.SetParent(handHolder.transform, true);
-            roundSet.Remove(roundSet[^1]);
+            GameObject g = roundSet[^1];
+            playerHand.Add(g);
+            g.GetComponent<PieceData>().isOutOfSet = true;
+            g.transform.SetParent(handHolder.transform, true);
+            roundSet.Remove(g);
             for (int i = 0; i < playerHand.Count; i++)
             {
                 playerHand[i].transform.localPosition = new Vector3(-1.7f, 0, 0) + ((4f / playerHand.Count) * i * Vector3.right) + Vector3.back * i;
@@ -76,10 +91,11 @@ public class PlayerSet : MonoBehaviour
         {
             playerHand.Add(roundPawnPile[^1]);
             roundPawnPile[^1].transform.SetParent(handHolder.transform, true);
+            roundPawnPile[^1].GetComponent<PieceData>().isOutOfSet = true;
             roundPawnPile.Remove(roundPawnPile[^1]);
             for (int i = 0; i < playerHand.Count; i++)
             {
-                playerHand[i].transform.localPosition = new Vector3(-1.7f, 0, 0) + ((3.5f / playerHand.Count) * i * Vector3.right) + Vector3.back * i;
+                playerHand[i].transform.localPosition = new Vector3(-1.7f, 0, 0) + ((3.5f / playerHand.Count) * i * Vector3.right) + Vector3.back * i + Vector3.back;
                 playerHand[i].transform.GetChild(0).GetChild(0).gameObject.GetComponent<SpriteRenderer>().sortingOrder = i + 1;
             }
         }

@@ -64,7 +64,8 @@ public class PieceManager : MonoBehaviour
         piece.transform.position = location;
         piece.transform.GetChild(0).GetChild(0).gameObject.GetComponent<SpriteRenderer>().sortingOrder = 1;
         pD.isOnBoard = true;
-        if(PlayerSet.instance.playerHand.Contains(piece)) PlayerSet.instance.playerHand.Remove(piece);
+        pD.isOutOfSet = true;
+        if (PlayerSet.instance.playerHand.Contains(piece)) PlayerSet.instance.playerHand.Remove(piece);
         UnpickPiece();
         piece.transform.parent = null;
     }

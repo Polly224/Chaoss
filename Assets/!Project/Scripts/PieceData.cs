@@ -22,6 +22,7 @@ public class PieceData : MonoBehaviour
     public int maxHealth, baseDamage, actualHealth, actualDamage, baseEnergyCost, actualEnergyCost;
     public bool isDead = false;
     public bool isOnBoard = false;
+    public bool isOutOfSet = false;
     public List<int> pieceValues = new();
     [HideInInspector]
     public PiecesDataStorage pieceData;
@@ -390,15 +391,20 @@ public class PieceData : MonoBehaviour
     }
     private void OnMouseDown()
     {
+        MouseClickFunc();
+    }
+
+    public void MouseClickFunc()
+    {
         // Pieces get picked when clicked on.
-        if (isWhite && RoundManager.isPlayerTurn)
+        if (isWhite && RoundManager.isPlayerTurn && isOutOfSet)
         {
             if (isOnBoard)
             {
                 PickPiece();
                 isHeld = true;
             }
-            if(!isOnBoard && RoundManager.playerEnergy >= actualEnergyCost)
+            if (!isOnBoard && RoundManager.playerEnergy >= actualEnergyCost)
             {
                 PickPiece();
                 isHeld = true;

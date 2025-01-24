@@ -6,6 +6,8 @@ using UnityEngine;
 public class DrawPieceButton : MonoBehaviour
 {
     [SerializeField] bool isPawnPile;
+    [SerializeField] GameObject currentSetDisplay;
+    bool showingDeck = false;
     private void OnMouseDown()
     {
         DrawFunc(isPawnPile);
@@ -13,9 +15,22 @@ public class DrawPieceButton : MonoBehaviour
 
     private void Update()
     {
-        if (Input.GetKeyDown(KeyCode.C))
+        if (Input.GetKeyDown(KeyCode.C) && !RoundManager.gameOver)
         {
-            // Show deck
+            if(RoundManager.isPlayerTurn) PieceManager.instance.UnpickPiece();
+            if (!isPawnPile)
+            {
+                showingDeck = !showingDeck;
+                if (!showingDeck)
+                {
+                    currentSetDisplay.GetComponent<SetDisplay>().ShowSetPieces(false);
+                }
+                currentSetDisplay.SetActive(showingDeck);
+                if (showingDeck)
+                {
+                    currentSetDisplay.GetComponent<SetDisplay>().ShowSetPieces(true);
+                }
+            }
         }
     }
 

@@ -26,6 +26,10 @@ public class RoundManager : MonoBehaviour
     [SerializeField] bool whitePlayedByCPU = false;
     [SerializeField] TMP_Text movesLeftText;
     [SerializeField] TMP_Text energyText;
+    [SerializeField] TMP_Text turnText;
+    [SerializeField] TMP_Text roundText;
+    [SerializeField] GameObject winScreen, loseScreen;
+    public static bool gameOver = false;
     private void Awake()
     {
         if (instance == null) instance = this;
@@ -40,17 +44,19 @@ public class RoundManager : MonoBehaviour
 
     private void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Space) && isPlayerTurn) EndTurn();
+        if (Input.GetKeyDown(KeyCode.Space) && isPlayerTurn && !gameOver) EndTurn();
 
         if (kingsSpawned)
         {
             if (playerKingData.isDead)
             {
-                // Lose condition
+                loseScreen.SetActive(true);
+                gameOver = true;
             }
             if (blackKingData.isDead)
             {
-                // Win condition
+                winScreen.SetActive(true);
+                gameOver = true;
             }
         }
     }
@@ -74,8 +80,10 @@ public class RoundManager : MonoBehaviour
     public void StartRound()
     {
         roundCount++;
+        roundText.text = "Round " + roundCount.ToString();
         hasDrawnPiece = false;
         turnCount = 1;
+        turnText.text = "Turn " + turnCount.ToString();
         SetTurnMoveAmount(maxMovesPerRound);
         blackMovesLeftThisRound = maxBlackMovesThisRound;
         SetEnergyAmount(playerEnergyPerTurn);
@@ -137,6 +145,7 @@ public class RoundManager : MonoBehaviour
         {
             hasDrawnPiece = false;
             turnCount++;
+            turnText.text = "Turn " + turnCount.ToString();
             foreach (GameObject g in PieceManager.whitePieces) g.GetComponent<PieceData>().pieceData.OnTurnStart?.Invoke(g, turnCount);
             foreach (GameObject g in PieceManager.blackPieces) g.GetComponent<PieceData>().pieceData.OnTurnStart?.Invoke(g, turnCount);
             SetTurnMoveAmount(maxMovesPerRound);
